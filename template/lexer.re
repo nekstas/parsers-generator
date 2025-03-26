@@ -34,7 +34,6 @@ lexer::TokenType lexer::Lexer::GetTokenType(const char*& str_ptr, const char* en
         * { return TokenType::Unknown; }
 
         // Your rules here...
-        // You also can change LexerContext lexer_context_ here
     */
     // NOLINTEND
 
