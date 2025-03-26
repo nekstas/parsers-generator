@@ -14,10 +14,7 @@ private:
         const char* prev = nullptr;
         const char* current = nullptr;
         const char* end = nullptr;
-
         const char* line_begin = nullptr;
-        size_t line = 0;
-        size_t pos = 0;
 
         Context() = default;
         explicit Context(const std::string& code)
@@ -37,8 +34,12 @@ public:
     void Init(const std::string& code);
     bool IsEnd();
     void ProcessNewToken();
-    void ProcessPosition();
+    void ProcessNewLines();
     void AddEofToken();
+    void ProcessEnd();
+    void AddLineToResult();
+    size_t GetCurrentLine();
+    size_t GetCurrentPos();
 
 private:
     lexer::Lexer lexer_;
