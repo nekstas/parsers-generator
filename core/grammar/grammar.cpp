@@ -16,23 +16,32 @@ const std::vector<grammar::Rule>& grammar::Grammar::GetRules() const {
     return rules_;
 }
 
-std::ostream& grammar::operator<<(std::ostream& out, const grammar::SequenceItem& item) {
-    if (item.type == SequenceItem::Type::Terminal) {
+void grammar::Grammar::SetMainRule(const std::string& name) {
+    main_rule_ = name;
+}
+
+std::string grammar::Grammar::GetMainRule() const {
+    return main_rule_;
+}
+
+std::ostream& operator<<(std::ostream& out, const grammar::SequenceItem& item) {
+    if (item.type == grammar::SequenceItem::Type::Terminal) {
         return out << item.value;
     }
     return out << "<" << item.value << ">";
 }
 
-std::ostream& grammar::operator<<(std::ostream& out, const grammar::Rule& rule) {
+std::ostream& operator<<(std::ostream& out, const grammar::Rule& rule) {
     out << "<" << rule.name << ">" << " ::=";
-    for (const SequenceItem& item : rule.sequence) {
+    for (const grammar::SequenceItem& item : rule.sequence) {
         out << " " << item;
     }
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::Grammar& grammar) {
-    out << "Grammar [" << grammar.GetRulesCount() << " rules]:\n";
+    out << "Grammar [" << grammar.GetRulesCount();
+    out << " rules, main rule <" << grammar.GetMainRule() << ">]:\n";
     for (const grammar::Rule& rule : grammar.GetRules()) {
         out << rule << "\n";
     }

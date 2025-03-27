@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "core/grammar/grammar.h"
+#include "core/grammar/grammar_info.h"
 #include "template/tokenizer.h"
 
 grammar::SequenceItem MakeT(const std::string& name) {
@@ -39,8 +40,10 @@ int main() {
     grammar.AddRule({"T", {MakeNT("F")}});
     grammar.AddRule({"E", {MakeNT("E"), MakeT("Plus"), MakeNT("T")}});
     grammar.AddRule({"E", {MakeNT("T")}});
-    grammar.AddRule({"main", {MakeNT("E")}});
-    std::cerr << grammar;
+    grammar.SetMainRule("E");
+
+    grammar::GrammarInfo grammar_info(grammar);
+    std::cerr << grammar_info;
 
     return 0;
 }

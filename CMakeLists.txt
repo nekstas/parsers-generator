@@ -15,4 +15,7 @@ add_executable(parsers_generator main.cpp
         template/tokenizer.cpp
         template/tokenizer.h
         core/grammar/grammar.cpp
-        core/grammar/grammar.h)
+        core/grammar/grammar.h
+        core/grammar/grammar_info.cpp
+        core/grammar/grammar_info.h
+        utils/input_output.hpp)
