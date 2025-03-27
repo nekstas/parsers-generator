@@ -15,6 +15,7 @@ public:
     GrammarInfo(const Grammar& grammar);
 
     const Grammar& GetGrammar() const;
+    size_t GetMainRule() const;
     const std::set<std::string>& GetUsedTokens() const;
     const std::set<std::string>& GetUsedRules() const;
 

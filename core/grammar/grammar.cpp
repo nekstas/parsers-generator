@@ -24,17 +24,25 @@ std::string grammar::Grammar::GetMainRule() const {
     return main_rule_;
 }
 
-std::ostream& operator<<(std::ostream& out, const grammar::SequenceItem& item) {
-    if (item.type == grammar::SequenceItem::Type::Terminal) {
-        return out << item.value;
+const grammar::Rule& grammar::Grammar::GetRule(size_t index) const {
+    return rules_.at(index);
+}
+
+const std::vector<size_t>& grammar::Grammar::GetRulesFor(const std::string& name) const {
+    return rules_for_name_.at(name);
+}
+
+std::ostream& operator<<(std::ostream& out, const grammar::Symbol& symbol) {
+    if (symbol.type == grammar::Symbol::Type::Terminal) {
+        return out << symbol.value;
     }
-    return out << "<" << item.value << ">";
+    return out << "<" << symbol.value << ">";
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::Rule& rule) {
     out << "<" << rule.name << ">" << " ::=";
-    for (const grammar::SequenceItem& item : rule.sequence) {
-        out << " " << item;
+    for (const grammar::Symbol& symbol : rule.sequence) {
+        out << " " << symbol;
     }
     return out;
 }
@@ -46,4 +54,16 @@ std::ostream& operator<<(std::ostream& out, const grammar::Grammar& grammar) {
         out << rule << "\n";
     }
     return out;
+}
+
+bool grammar::Symbol::operator<(const grammar::Symbol& other) const {
+    return std::tie(type, value) < std::tie(other.type, other.value);
+}
+
+bool grammar::Symbol::operator==(const grammar::Symbol& other) const {
+    return std::tie(type, value) == std::tie(other.type, other.value);
+}
+
+bool grammar::Symbol::operator!=(const grammar::Symbol& other) const {
+    return !(*this == other);
 }

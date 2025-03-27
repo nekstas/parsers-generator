@@ -1,15 +1,16 @@
 #include <iostream>
 
+#include "core/generators/slr_generator.h"
 #include "core/grammar/grammar.h"
 #include "core/grammar/grammar_info.h"
 #include "template/tokenizer.h"
 
-grammar::SequenceItem MakeT(const std::string& name) {
-    return {grammar::SequenceItem::Type::Terminal, name};
+grammar::Symbol MakeT(const std::string& name) {
+    return {grammar::Symbol::Type::Terminal, name};
 }
 
-grammar::SequenceItem MakeNT(const std::string& name) {
-    return {grammar::SequenceItem::Type::NonTerminal, name};
+grammar::Symbol MakeNT(const std::string& name) {
+    return {grammar::Symbol::Type::NonTerminal, name};
 }
 
 int main() {
@@ -44,6 +45,8 @@ int main() {
 
     grammar::GrammarInfo grammar_info(grammar);
     std::cerr << grammar_info;
+
+    generators::SlrGenerator generator(grammar_info);
 
     return 0;
 }

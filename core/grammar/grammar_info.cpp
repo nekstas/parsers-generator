@@ -17,6 +17,10 @@ const grammar::Grammar& grammar::GrammarInfo::GetGrammar() const {
     return grammar_;
 }
 
+size_t grammar::GrammarInfo::GetMainRule() const {
+    return grammar_.GetRulesCount() - 1;
+}
+
 const std::set<std::string>& grammar::GrammarInfo::GetUsedTokens() const {
     return used_tokens_;
 }
@@ -32,16 +36,15 @@ void grammar::GrammarInfo::UpdateMainRule() {
         throw std::runtime_error{"No main rule."};
     }
 
-    grammar::SequenceItem item = {grammar::SequenceItem::Type::NonTerminal, old_main_rule};
-
-    grammar_.AddRule({kNewMainRuleName, {item}});
+    grammar::Symbol symbol = {grammar::Symbol::Type::NonTerminal, old_main_rule};
+    grammar_.AddRule({kNewMainRuleName, {symbol}});
     grammar_.SetMainRule(kNewMainRuleName);
 }
 
 void grammar::GrammarInfo::BuildUsedSets() {
     for (const grammar::Rule& rule : grammar_.GetRules()) {
-        for (const grammar::SequenceItem& item : rule.sequence) {
-            if (item.type == SequenceItem::Type::Terminal) {
+        for (const grammar::Symbol& item : rule.sequence) {
+            if (item.type == Symbol::Type::Terminal) {
                 used_tokens_.insert(item.value);
             } else {
                 used_rules_.insert(item.value);
