@@ -43,16 +43,30 @@ void grammar::GrammarInfo::UpdateMainRule() {
 
 void grammar::GrammarInfo::BuildUsedSets() {
     for (const grammar::Rule& rule : grammar_.GetRules()) {
-        for (const grammar::Symbol& item : rule.sequence) {
-            if (item.type == Symbol::Type::Terminal) {
-                used_tokens_.insert(item.value);
-            } else {
-                used_rules_.insert(item.value);
-            }
+        for (const grammar::Symbol& symbol : rule.sequence) {
+            AddUsedSymbol(symbol);
         }
     }
 
     used_tokens_.insert(kEofTokenName);
+}
+
+void grammar::GrammarInfo::AddUsedToken(const std::string& name) {
+    used_tokens_.insert(name);
+    used_symbols_.insert({Symbol::Type::Terminal, name});
+}
+
+void grammar::GrammarInfo::AddUsedRule(const std::string& name) {
+    used_rules_.insert(name);
+    used_symbols_.insert({Symbol::Type::NonTerminal, name});
+}
+
+void grammar::GrammarInfo::AddUsedSymbol(const grammar::Symbol& symbol) {
+    if (symbol.type == Symbol::Type::Terminal) {
+        AddUsedToken(symbol.value);
+    } else {
+        AddUsedRule(symbol.value);
+    }
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::GrammarInfo& info) {

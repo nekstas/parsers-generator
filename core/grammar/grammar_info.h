@@ -22,12 +22,16 @@ public:
 private:
     void Build();
     void UpdateMainRule();
+    void AddUsedToken(const std::string& name);
+    void AddUsedRule(const std::string& name);
+    void AddUsedSymbol(const Symbol& symbol);
     void BuildUsedSets();
 
 private:
     Grammar grammar_;
     std::set<std::string> used_tokens_;
     std::set<std::string> used_rules_;
+    std::set<Symbol> used_symbols_;
 };
 
 }  // namespace grammar
