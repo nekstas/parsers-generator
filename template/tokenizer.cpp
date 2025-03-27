@@ -26,8 +26,10 @@ void pg::Tokenizer::ProcessNewToken() {
     lexer::TokenType type = lexer_.GetTokenType(context_.current, context_.end);
     if (type == lexer::TokenType::Unknown) {
         // TODO: throw an error
+        throw std::runtime_error{"Unknown Token."};
     } else if (type == lexer::TokenType::Eof) {
         // TODO: think, what we should do here
+        throw std::runtime_error{"Unexpected Eof."};
     } else if (type != lexer::TokenType::Skip) {
         result_.tokens.emplace_back(type, std::string(context_.prev, context_.current),
                                     GetCurrentLine(), GetCurrentPos());

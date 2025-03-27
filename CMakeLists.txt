@@ -13,4 +13,6 @@ add_executable(parsers_generator main.cpp
         template/lexer.h
         template/lexer.cpp
         template/tokenizer.cpp
-        template/tokenizer.h)
+        template/tokenizer.h
+        core/grammar/grammar.cpp
+        core/grammar/grammar.h)
