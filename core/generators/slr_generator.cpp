@@ -2,17 +2,7 @@
 
 generators::SlrGenerator::SlrGenerator(const grammar::GrammarInfo& grammar_info)
     : grammar_info_(grammar_info), grammar_(grammar_info.GetGrammar()) {
-
-    std::cerr << "\n";
-    auto x = Closure({GetMainItem()});
-    Visualize(std::cerr, x);
-    std::cerr << "\n";
-    auto y = Goto(x, {grammar::Symbol::Type::NonTerminal, "E"});
-    Visualize(std::cerr, y);
-    std::cerr << "\n";
-    auto z = Goto(y, {grammar::Symbol::Type::Terminal, "Plus"});
-    Visualize(std::cerr, z);
-    std::cerr << "\n";
+    BuildStates();
 }
 
 generators::SetOfLr0Items generators::SlrGenerator::Closure(generators::SetOfLr0Items items) const {
@@ -64,7 +54,7 @@ void generators::SlrGenerator::Visualize(std::ostream& out,
                                          const generators::SetOfLr0Items& items) const {
     const auto& grammar = grammar_info_.GetGrammar();
     for (const generators::Lr0Item& item : items) {
-        item.Visualize(out, grammar);
+        Visualize(out, item);
         out << "\n";
     }
 }
@@ -77,17 +67,85 @@ bool generators::Lr0Item::operator<(const generators::Lr0Item& other) const {
     return std::tie(rule, pos) < std::tie(other.rule, other.pos);
 }
 
-void generators::Lr0Item::Visualize(std::ostream& out, const grammar::Grammar& grammar) const {
-    const grammar::Rule& rule_object = grammar.GetRule(rule);
+void generators::SlrGenerator::Visualize(std::ostream& out, const generators::Lr0Item& item) const {
+    const grammar::Rule& rule_object = grammar_.GetRule(item.rule);
     out << "<" << rule_object.name << ">" << " ::=";
     for (size_t i = 0; i < rule_object.sequence.size(); ++i) {
         out << " ";
-        if (i == pos) {
+        if (i == item.pos) {
             out << "·";
         }
         out << rule_object.sequence[i];
     }
-    if (pos == rule_object.sequence.size()) {
+    if (item.pos == rule_object.sequence.size()) {
         out << " ·";
+    }
+}
+
+bool generators::SlrStates::HasState(const generators::SetOfLr0Items& items) const {
+    return state_by_set_.contains(items);
+}
+
+void generators::SlrStates::AddState(const generators::SetOfLr0Items& items) {
+    if (HasState(items)) {
+        return;
+    }
+
+    size_t index = states_.size();
+    states_.push_back(items);
+    state_by_set_[items] = index;
+    goto_.emplace_back();
+}
+
+size_t generators::SlrStates::GetCount() const {
+    return states_.size();
+}
+
+const generators::SetOfLr0Items& generators::SlrStates::GetState(size_t index) const {
+    return states_.at(index);
+}
+
+void generators::SlrStates::AddEdge(const generators::SetOfLr0Items& from,
+                                    const generators::SetOfLr0Items& to,
+                                    const grammar::Symbol& symbol) {
+    size_t from_index = GetState(from);
+    size_t to_index = GetState(to);
+    goto_[from_index][symbol] = to_index;
+}
+
+size_t generators::SlrStates::GetState(const generators::SetOfLr0Items& items) const {
+    return state_by_set_.at(items);
+}
+
+const std::map<grammar::Symbol, size_t>& generators::SlrStates::GetGoto(size_t index) const {
+    return goto_.at(index);
+}
+
+void generators::SlrGenerator::BuildStates() {
+    states_ = {};
+    states_.AddState(Closure({GetMainItem()}));
+
+    for (size_t i = 0; i < states_.GetCount(); ++i) {
+        auto items = states_.GetState(i);
+        for (const grammar::Symbol& symbol : grammar_info_.GetUsedSymbols()) {
+            auto new_items = Goto(items, symbol);
+            if (!new_items.empty()) {
+                states_.AddState(new_items);
+                states_.AddEdge(items, new_items, symbol);
+            }
+        }
+    }
+}
+
+void generators::SlrGenerator::Visualize(std::ostream& out) const {
+    out << "[SLR States]\n";
+    for (size_t i = 0; i < states_.GetCount(); ++i) {
+        out << "State [" << i << "]";
+        for (const auto& [symbol, j] : states_.GetGoto(i)) {
+            out << ", " << symbol << " -> " << j;
+        }
+        out << "\n";
+        Visualize(out, states_.GetState(i));
+        out << "\n";
     }
 }

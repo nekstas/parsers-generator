@@ -69,6 +69,10 @@ void grammar::GrammarInfo::AddUsedSymbol(const grammar::Symbol& symbol) {
     }
 }
 
+const std::set<grammar::Symbol>& grammar::GrammarInfo::GetUsedSymbols() const {
+    return used_symbols_;
+}
+
 std::ostream& operator<<(std::ostream& out, const grammar::GrammarInfo& info) {
     out << info.GetGrammar();
     out << "Used tokens: " << info.GetUsedTokens() << "\n";

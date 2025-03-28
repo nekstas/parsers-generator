@@ -18,6 +18,7 @@ public:
     size_t GetMainRule() const;
     const std::set<std::string>& GetUsedTokens() const;
     const std::set<std::string>& GetUsedRules() const;
+    const std::set<Symbol>& GetUsedSymbols() const;
 
 private:
     void Build();
@@ -29,9 +30,13 @@ private:
 
 private:
     Grammar grammar_;
+
     std::set<std::string> used_tokens_;
     std::set<std::string> used_rules_;
     std::set<Symbol> used_symbols_;
+
+    std::map<Symbol, std::set<std::string>> first_;
+    std::map<Symbol, std::set<std::string>> follow_;
 };
 
 }  // namespace grammar

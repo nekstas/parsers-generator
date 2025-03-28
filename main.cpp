@@ -44,9 +44,10 @@ int main() {
     grammar.SetMainRule("E");
 
     grammar::GrammarInfo grammar_info(grammar);
-    std::cerr << grammar_info;
+    std::cerr << grammar_info << "\n";
 
     generators::SlrGenerator generator(grammar_info);
+    generator.Visualize(std::cerr);
 
     return 0;
 }
