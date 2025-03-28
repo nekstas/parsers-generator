@@ -27,6 +27,7 @@ private:
     void AddUsedRule(const std::string& name);
     void AddUsedSymbol(const Symbol& symbol);
     void BuildUsedSets();
+    void CheckUsedRules();
 
 private:
     Grammar grammar_;

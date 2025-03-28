@@ -9,8 +9,7 @@ grammar::GrammarInfo::GrammarInfo(const grammar::Grammar& grammar) : grammar_(gr
 void grammar::GrammarInfo::Build() {
     UpdateMainRule();
     BuildUsedSets();
-
-    // TODO: check all used rules exist and no extra rules
+    CheckUsedRules();
 }
 
 const grammar::Grammar& grammar::GrammarInfo::GetGrammar() const {
@@ -48,7 +47,8 @@ void grammar::GrammarInfo::BuildUsedSets() {
         }
     }
 
-    used_tokens_.insert(kEofTokenName);
+    AddUsedToken(kEofTokenName);
+    AddUsedRule(kNewMainRuleName);
 }
 
 void grammar::GrammarInfo::AddUsedToken(const std::string& name) {
@@ -71,6 +71,24 @@ void grammar::GrammarInfo::AddUsedSymbol(const grammar::Symbol& symbol) {
 
 const std::set<grammar::Symbol>& grammar::GrammarInfo::GetUsedSymbols() const {
     return used_symbols_;
+}
+
+void grammar::GrammarInfo::CheckUsedRules() {
+    const auto& rules_map = grammar_.GetRulesMap();
+
+    for (const auto& [name, rules] : rules_map) {
+        if (!used_rules_.contains(name)) {
+            // TODO: throw an error.
+            throw std::runtime_error{"Rule is useless."};
+        }
+    }
+
+    for (const std::string& rule : used_rules_) {
+        if (!rules_map.contains(rule)) {
+            // TODO: throw an error.
+            throw std::runtime_error{"Rule does not exist."};
+        }
+    }
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::GrammarInfo& info) {

@@ -33,6 +33,7 @@ public:
     size_t GetRulesCount() const;
     const std::vector<Rule>& GetRules() const;
     const std::vector<size_t>& GetRulesFor(const std::string& name) const;
+    const std::map<std::string, std::vector<size_t>>& GetRulesMap() const;
 
 private:
     std::vector<Rule> rules_;

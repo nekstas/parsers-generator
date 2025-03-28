@@ -32,6 +32,10 @@ const std::vector<size_t>& grammar::Grammar::GetRulesFor(const std::string& name
     return rules_for_name_.at(name);
 }
 
+const std::map<std::string, std::vector<size_t>>& grammar::Grammar::GetRulesMap() const {
+    return rules_for_name_;
+}
+
 std::ostream& operator<<(std::ostream& out, const grammar::Symbol& symbol) {
     if (symbol.type == grammar::Symbol::Type::Terminal) {
         return out << symbol.value;
