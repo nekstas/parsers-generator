@@ -39,6 +39,8 @@ pg::TokenType pg::Lexer::GetTokenType(const char*& str_ptr, const char* end) {
 
         "+" { return TokenType::Plus; }
         "*" { return TokenType::Star; }
+        "(" { return TokenType::OpenBracket; }
+        ")" { return TokenType::CloseBracket; }
 
     */
     // NOLINTEND

@@ -12,8 +12,8 @@ add_custom_command(
 add_executable(parsers_generator main.cpp
         template/lexer.h
         template/lexer.cpp
-        template/tokenizer.cpp
-        template/tokenizer.h
+        template/lib/tokenizer.cpp
+        template/lib/tokenizer.h
         core/grammar/grammar.cpp
         core/grammar/grammar.h
         core/grammar/grammar_info.cpp
@@ -21,4 +21,13 @@ add_executable(parsers_generator main.cpp
         utils/input_output.hpp
         core/generators/slr_generator.cpp
         core/generators/slr_generator.h
+        template/lib/parser.cpp
+        template/lib/parser.h
+        template/lib/lr_data.h
+        template/lib/grammar.h
+        template/data/identifiers.h
+        core/code/cpp_generator.cpp
+        core/code/cpp_generator.h
+        template/data/tables.h
+        template/data/grammar.h
 )

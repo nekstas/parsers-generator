@@ -1,9 +1,10 @@
 #include <iostream>
 
+#include "core/code/cpp_generator.h"
 #include "core/generators/slr_generator.h"
 #include "core/grammar/grammar.h"
 #include "core/grammar/grammar_info.h"
-#include "template/tokenizer.h"
+#include "template/lib/tokenizer.h"
 
 grammar::Symbol MakeT(const std::string& name) {
     return {grammar::Symbol::Type::Terminal, name};
@@ -50,6 +51,8 @@ int main() {
     generator.Visualize(std::cerr);
 
     generators::LrTables tables = generator.GenerateTables();
+    code::CppGenerator code_gen(grammar_info, tables);
+    code_gen.Generate("../template");
 
     return 0;
 }

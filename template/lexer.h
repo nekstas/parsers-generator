@@ -14,8 +14,8 @@ enum class TokenType : size_t {
     Number,
     Plus,
     Star,
-    LeftBracket,
-    RightBracket,
+    OpenBracket,
+    CloseBracket,
 };
 
 class Token {

@@ -181,7 +181,9 @@ generators::LrTables generators::SlrGenerator::GenerateTables() {
         }
 
         for (const grammar::Symbol& symbol : grammar_info_.GetUsedSymbols()) {
-            result.SetErrorIfNoAction(i, symbol);
+            if (symbol.value != grammar::GrammarInfo::kNewMainRuleName) {
+                result.SetErrorIfNoAction(i, symbol);
+            }
         }
     }
 
@@ -235,22 +237,4 @@ void generators::LrTables::SetErrorIfNoAction(size_t state, const grammar::Symbo
 
 void generators::LrTables::AddErrorAction(size_t state, const std::string& token) {
     AddAction(state, token, {LrAction::Type::ERROR, 0});
-}
-
-std::ostream& operator<<(std::ostream& out, const generators::LrAction& action) {
-    switch (action.type) {
-        case generators::LrAction::Type::SHIFT:
-            out << "s";
-            break;
-        case generators::LrAction::Type::REDUCE:
-            out << "r";
-            break;
-        case generators::LrAction::Type::ACCEPT:
-            out << "a";
-            break;
-        case generators::LrAction::Type::ERROR:
-            out << "e";
-            break;
-    }
-    return out << action.index;
 }

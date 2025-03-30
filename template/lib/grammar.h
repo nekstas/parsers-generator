@@ -8,7 +8,7 @@
 
 namespace pg {
 
-using Symbol = std::variant<Token, Identifier>;
+using Symbol = std::variant<TokenType, Identifier>;
 
 struct Rule {
     Identifier result;
