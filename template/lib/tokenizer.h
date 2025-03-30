@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "lexer.h"
+#include "../lexer.h"
 
 namespace pg {
 
