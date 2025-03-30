@@ -17,6 +17,9 @@ struct Symbol {
     bool operator<(const Symbol& other) const;
     bool operator==(const Symbol& other) const;
     bool operator!=(const Symbol& other) const;
+
+    static Symbol MakeTerminal(const std::string& name);
+    static Symbol MakeNonTerminal(const std::string& name);
 };
 
 struct Rule {

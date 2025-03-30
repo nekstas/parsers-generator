@@ -22,6 +22,7 @@ public:
     const std::set<Symbol>& GetUsedSymbols() const;
     const std::map<Symbol, std::set<std::string>>& GetFirstMap() const;
     const std::map<std::string, std::set<std::string>>& GetFollowMap() const;
+    const std::set<std::string>& GetFollow(const std::string& name) const;
 
 private:
     void Build();

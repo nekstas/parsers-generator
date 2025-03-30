@@ -20,4 +20,5 @@ add_executable(parsers_generator main.cpp
         core/grammar/grammar_info.h
         utils/input_output.hpp
         core/generators/slr_generator.cpp
-        core/generators/slr_generator.h)
+        core/generators/slr_generator.h
+)

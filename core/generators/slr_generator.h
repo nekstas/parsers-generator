@@ -34,9 +34,36 @@ private:
     std::vector<std::map<grammar::Symbol, size_t>> goto_;
 };
 
+struct LrAction {
+    enum class Type { SHIFT, REDUCE, ACCEPT, ERROR };
+    Type type;
+    size_t index;
+};
+
+using LrActionTable = std::vector<std::map<std::string, LrAction>>;
+using LrGotoTable = std::vector<std::map<std::string, size_t>>;
+
+struct LrTables {
+    LrActionTable action_table;
+    LrGotoTable goto_table;
+
+    LrTables(size_t size);
+
+    void AddAction(size_t state, const std::string& token, const LrAction& action);
+    void AddShiftAction(size_t state, const std::string& token, size_t new_state);
+    void AddReduceAction(size_t state, const std::string& token, size_t rule);
+    void AddAcceptAction(size_t state, const std::string& token);
+    void AddErrorAction(size_t state, const std::string& token);
+
+    void AddGoto(size_t state, const std::string& symbol, size_t new_state);
+    void SetErrorIfNoAction(size_t state, const grammar::Symbol& symbol);
+};
+
 class SlrGenerator {
 public:
     SlrGenerator(const grammar::GrammarInfo& grammar_info);
+
+    LrTables GenerateTables();
 
     void Visualize(std::ostream& out, const Lr0Item& item) const;
     void Visualize(std::ostream& out, const SetOfLr0Items& items) const;
@@ -56,3 +83,5 @@ private:
 };
 
 }  // namespace generators
+
+std::ostream& operator<<(std::ostream& out, const generators::LrAction& action);

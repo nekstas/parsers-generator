@@ -149,3 +149,108 @@ void generators::SlrGenerator::Visualize(std::ostream& out) const {
         out << "\n";
     }
 }
+
+generators::LrTables generators::SlrGenerator::GenerateTables() {
+    LrTables result(states_.GetCount());
+
+    for (size_t i = 0; i < states_.GetCount(); ++i) {
+        const auto& state = states_.GetState(i);
+        const auto& edges = states_.GetGoto(i);
+
+        for (const auto& [symbol, new_state] : edges) {
+            if (symbol.type == grammar::Symbol::Type::Terminal) {
+                result.AddShiftAction(i, symbol.value, edges.at(symbol));
+            } else {
+                result.AddGoto(i, symbol.value, edges.at(symbol));
+            }
+        }
+
+        for (const Lr0Item& item : state) {
+            const grammar::Rule& rule = grammar_.GetRule(item.rule);
+
+            if (item.pos != rule.sequence.size()) {
+                continue;
+            } else if (rule.name == grammar_.GetMainRule()) {
+                result.AddAcceptAction(i, grammar::GrammarInfo::kEofTokenName);
+                continue;
+            }
+
+            for (const std::string& token : grammar_info_.GetFollow(rule.name)) {
+                result.AddReduceAction(i, token, item.rule);
+            }
+        }
+
+        for (const grammar::Symbol& symbol : grammar_info_.GetUsedSymbols()) {
+            result.SetErrorIfNoAction(i, symbol);
+        }
+    }
+
+    return result;
+}
+
+generators::LrTables::LrTables(size_t size) : action_table(size), goto_table(size) {
+}
+
+void generators::LrTables::AddAction(size_t state, const std::string& token,
+                                     const generators::LrAction& action) {
+    if (action_table[state].contains(token)) {
+        // TODO: throw an error
+        throw std::runtime_error{"Action conflict"};
+    }
+    action_table[state][token] = action;
+}
+
+void generators::LrTables::AddShiftAction(size_t state, const std::string& token,
+                                          size_t new_state) {
+    AddAction(state, token, {LrAction::Type::SHIFT, new_state});
+}
+
+void generators::LrTables::AddReduceAction(size_t state, const std::string& token, size_t rule) {
+    AddAction(state, token, {LrAction::Type::REDUCE, rule});
+}
+
+void generators::LrTables::AddAcceptAction(size_t state, const std::string& token) {
+    AddAction(state, token, {LrAction::Type::ACCEPT, 0});
+}
+
+void generators::LrTables::AddGoto(size_t state, const std::string& symbol, size_t new_state) {
+    if (goto_table[state].contains(symbol)) {
+        // TODO: throw an error
+        throw std::logic_error{"Goto conflict"};
+    }
+    goto_table[state][symbol] = new_state;
+}
+
+void generators::LrTables::SetErrorIfNoAction(size_t state, const grammar::Symbol& symbol) {
+    if (symbol.type == grammar::Symbol::Type::Terminal) {
+        if (!action_table[state].contains(symbol.value)) {
+            AddErrorAction(state, symbol.value);
+        }
+    } else {
+        if (!goto_table[state].contains(symbol.value)) {
+            AddGoto(state, symbol.value, -1);
+        }
+    }
+}
+
+void generators::LrTables::AddErrorAction(size_t state, const std::string& token) {
+    AddAction(state, token, {LrAction::Type::ERROR, 0});
+}
+
+std::ostream& operator<<(std::ostream& out, const generators::LrAction& action) {
+    switch (action.type) {
+        case generators::LrAction::Type::SHIFT:
+            out << "s";
+            break;
+        case generators::LrAction::Type::REDUCE:
+            out << "r";
+            break;
+        case generators::LrAction::Type::ACCEPT:
+            out << "a";
+            break;
+        case generators::LrAction::Type::ERROR:
+            out << "e";
+            break;
+    }
+    return out << action.index;
+}

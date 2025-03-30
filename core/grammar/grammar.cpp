@@ -71,3 +71,11 @@ bool grammar::Symbol::operator==(const grammar::Symbol& other) const {
 bool grammar::Symbol::operator!=(const grammar::Symbol& other) const {
     return !(*this == other);
 }
+
+grammar::Symbol grammar::Symbol::MakeTerminal(const std::string& name) {
+    return {Symbol::Type::Terminal, name};
+}
+
+grammar::Symbol grammar::Symbol::MakeNonTerminal(const std::string& name) {
+    return {Symbol::Type::NonTerminal, name};
+}

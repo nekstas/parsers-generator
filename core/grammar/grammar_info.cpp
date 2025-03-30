@@ -95,15 +95,15 @@ void grammar::GrammarInfo::CheckUsedRules() {
 
 void grammar::GrammarInfo::BuildFirstValues() {
     for (const std::string& token : used_tokens_) {
-        first_[MakeTerminal(token)] = {token};
+        first_[Symbol::MakeTerminal(token)] = {token};
     }
-    first_[MakeTerminal(kEmptyRuleName)] = {kEmptyRuleName};
+    first_[Symbol::MakeTerminal(kEmptyRuleName)] = {kEmptyRuleName};
 
     bool sets_changed = true;
     while (sets_changed) {
         sets_changed = false;
         for (const Rule& rule : grammar_.GetRules()) {
-            auto& current = first_[MakeNonTerminal(rule.name)];
+            auto& current = first_[Symbol::MakeNonTerminal(rule.name)];
             for (size_t i = 0; i < rule.sequence.size(); ++i) {
                 sets_changed |= MoveTokens(first_[rule.sequence[i]], current);
 
@@ -142,14 +142,6 @@ void grammar::GrammarInfo::BuildFollowValues() {
     }
 }
 
-grammar::Symbol grammar::GrammarInfo::MakeTerminal(const std::string& name) {
-    return {Symbol::Type::Terminal, name};
-}
-
-grammar::Symbol grammar::GrammarInfo::MakeNonTerminal(const std::string& name) {
-    return {Symbol::Type::NonTerminal, name};
-}
-
 const std::map<grammar::Symbol, std::set<std::string>>& grammar::GrammarInfo::GetFirstMap() const {
     return first_;
 }
@@ -168,6 +160,10 @@ bool grammar::GrammarInfo::MoveTokens(const std::set<std::string>& values,
         }
     }
     return result_changed;
+}
+
+const std::set<std::string>& grammar::GrammarInfo::GetFollow(const std::string& name) const {
+    return follow_.at(name);
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::GrammarInfo& info) {

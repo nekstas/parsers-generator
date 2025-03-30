@@ -49,5 +49,7 @@ int main() {
     generators::SlrGenerator generator(grammar_info);
     generator.Visualize(std::cerr);
 
+    generators::LrTables tables = generator.GenerateTables();
+
     return 0;
 }
