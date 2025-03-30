@@ -1,26 +1,26 @@
 #include "lexer.h"
 
-lexer::Token::Token(lexer::TokenType type, std::string value, size_t line, size_t pos)
+pg::Token::Token(pg::TokenType type, std::string value, size_t line, size_t pos)
     : type_(type), value_(value), line_(line), pos_(pos) {
 }
 
-lexer::TokenType lexer::Token::GetTokenType() const {
+pg::TokenType pg::Token::GetTokenType() const {
     return type_;
 }
 
-const std::string& lexer::Token::GetValue() const {
+const std::string& pg::Token::GetValue() const {
     return value_;
 }
 
-const size_t lexer::Token::GetLine() const {
+const size_t pg::Token::GetLine() const {
     return line_;
 }
 
-const size_t lexer::Token::GetPos() const {
+const size_t pg::Token::GetPos() const {
     return pos_;
 }
 
-lexer::TokenType lexer::Lexer::GetTokenType(const char*& str_ptr, const char* end) {
+pg::TokenType pg::Lexer::GetTokenType(const char*& str_ptr, const char* end) {
     const char* marker = nullptr;
 
     // NOLINTBEGIN
@@ -34,6 +34,12 @@ lexer::TokenType lexer::Lexer::GetTokenType(const char*& str_ptr, const char* en
         * { return TokenType::Unknown; }
 
         // Your rules here...
+        [1-9][0-9]* { return TokenType::Number; }
+        [ \n\s\t] { return TokenType::Skip; }
+
+        "+" { return TokenType::Plus; }
+        "*" { return TokenType::Star; }
+
     */
     // NOLINTEND
 

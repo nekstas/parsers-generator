@@ -24,7 +24,7 @@ private:
 
 public:
     struct Result {
-        std::vector<lexer::Token> tokens;
+        std::vector<pg::Token> tokens;
         std::vector<std::string> lines;
     };
 
@@ -42,7 +42,7 @@ public:
     size_t GetCurrentPos();
 
 private:
-    lexer::Lexer lexer_;
+    pg::Lexer lexer_;
     Context context_;
     Result result_;
 };

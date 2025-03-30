@@ -3,13 +3,19 @@
 #include <cstdint>
 #include <string>
 
-namespace lexer {
+namespace pg {
 
 enum class TokenType : size_t {
     Eof,      // End Of File,
     Skip,     // Don't use a token in parser
     Unknown,  // Unknown token, throw an error
+
     // Add more tokens here...
+    Number,
+    Plus,
+    Star,
+    LeftBracket,
+    RightBracket,
 };
 
 class Token {
@@ -36,4 +42,4 @@ private:
     // You can add some properties here if it needs
 };
 
-}  // namespace lexer
+}  // namespace pg

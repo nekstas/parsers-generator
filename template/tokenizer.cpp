@@ -13,7 +13,7 @@ pg::Tokenizer::Result pg::Tokenizer::Tokenize(const std::string& code) {
 }
 
 void pg::Tokenizer::Init(const std::string& code) {
-    lexer_ = lexer::Lexer{};
+    lexer_ = pg::Lexer{};
     context_ = Context{code};
     result_ = Result{};
 }
@@ -23,14 +23,14 @@ bool pg::Tokenizer::IsEnd() {
 }
 
 void pg::Tokenizer::ProcessNewToken() {
-    lexer::TokenType type = lexer_.GetTokenType(context_.current, context_.end);
-    if (type == lexer::TokenType::Unknown) {
+    pg::TokenType type = lexer_.GetTokenType(context_.current, context_.end);
+    if (type == pg::TokenType::Unknown) {
         // TODO: throw an error
         throw std::runtime_error{"Unknown Token."};
-    } else if (type == lexer::TokenType::Eof) {
+    } else if (type == pg::TokenType::Eof) {
         // TODO: think, what we should do here
         throw std::runtime_error{"Unexpected Eof."};
-    } else if (type != lexer::TokenType::Skip) {
+    } else if (type != pg::TokenType::Skip) {
         result_.tokens.emplace_back(type, std::string(context_.prev, context_.current),
                                     GetCurrentLine(), GetCurrentPos());
     }
@@ -45,7 +45,7 @@ void pg::Tokenizer::ProcessNewLines() {
 }
 
 void pg::Tokenizer::AddEofToken() {
-    result_.tokens.emplace_back(lexer::TokenType::Eof, "", GetCurrentLine(), GetCurrentPos());
+    result_.tokens.emplace_back(pg::TokenType::Eof, "", GetCurrentLine(), GetCurrentPos());
 }
 
 void pg::Tokenizer::ProcessEnd() {
