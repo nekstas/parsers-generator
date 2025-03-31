@@ -12,6 +12,7 @@ using Symbol = std::variant<TokenType, Identifier>;
 
 struct Rule {
     Identifier result;
+    std::string repr;
     std::vector<Symbol> sequence;
 };
 

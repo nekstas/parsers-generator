@@ -1,5 +1,7 @@
 #include "parser.h"
 
+#include <iostream>
+
 pg::LrParser::LrParser(const pg::LrData& data) : data_(data) {
 }
 
@@ -10,7 +12,7 @@ void pg::LrParser::Parse(const std::vector<Token>& tokens) {
     }
 
     std::vector<size_t> states = {0};
-    for (size_t i = 0; i < tokens.size() && states.size() > 1;) {
+    for (size_t i = 0; i < tokens.size() && !states.empty();) {
         size_t current_state = states.back();
         Token current_token = tokens.at(i);
 
@@ -23,8 +25,9 @@ void pg::LrParser::Parse(const std::vector<Token>& tokens) {
             for (size_t j = 0; j < rule.sequence.size(); ++j) {
                 states.pop_back();
             }
-            states.push_back(data_.goto_table.at(current_state).at(rule.result));
+            states.push_back(data_.goto_table.at(states.back()).at(rule.result));
             // Todo call process function
+            std::cerr << "Reduce " << data_.grammar.rules.at(action.index).repr << "\n";
         } else if (action.type == LrAction::Type::ACCEPT) {
             // Todo accept action
             break;

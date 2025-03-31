@@ -43,13 +43,13 @@ void code::CppGenerator::GenerateGrammar(const std::string& path) {
 
         out << "{";
         WriteIdentifier(out, rule.name);
-        out << ", {";
+        out << ", \"" << rule << "\", {";
         for (const grammar::Symbol& symbol : rule.sequence) {
             WriteSymbol(out, symbol) << ", ";
         }
         out << "}},\n";
     }
-    out << "}};";
+    out << "}};\n";
     out << "}\n";
 }
 

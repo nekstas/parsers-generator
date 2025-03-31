@@ -21,9 +21,9 @@ using LrActionTable = std::vector<std::map<TokenType, LrAction>>;
 using LrGotoTable = std::vector<std::map<Identifier, size_t>>;
 
 struct LrData {
+    Grammar grammar;
     LrActionTable action_table;
     LrGotoTable goto_table;
-    Grammar grammar;
 };
 
 }  // namespace pg
