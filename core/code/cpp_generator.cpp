@@ -150,6 +150,7 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
     out << "#pragma once\n";
     out << "#include <vector>\n";
     out << "#include \"../lib/ast_node.h\"\n";
+    out << "#include \"../lib/grammar.h\"\n";
     out << "#include \"../lib/token.h\"\n\n";
     out << "namespace " << kNamespace << " {\n";
     out << "class " << kAstBuilderClassName << " {\n";
@@ -171,20 +172,7 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
             out << "    virtual " << kAstNodePtr << " ";
             WriteMethodForRuleName(out, rule, i);
 
-            out << "(";
-            for (const auto& symbol : rule.sequence) {
-                if (symbol.type == grammar::Symbol::Type::Terminal) {
-                    out << "const Token&";
-                } else {
-                    out << kAstNodePtr;
-                }
-                if (&symbol != &rule.sequence.back()) {
-                    out << ", ";
-                }
-            }
-            out << ") = 0;\n";
-
-            //            out << "(const std::vector<AstNodePtr>& stack) = 0;\n";
+            out << "(const Rule::HandlerArgs& args) = 0;\n";
         }
     }
 
@@ -208,5 +196,5 @@ void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::st
 
 void code::CppGenerator::WriteMethodForRuleName(std::ostream& out, const grammar::Rule& rule,
                                                 size_t number) {
-    out << "HandleRule" << rule.name << "_" << (number + 1);
+    out << "HandleRule_" << rule.name << "_" << (number + 1);
 }
