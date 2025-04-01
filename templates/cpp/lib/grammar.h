@@ -16,7 +16,7 @@ using Symbol = std::variant<TokenType, Identifier>;
 class AstBuilder;
 
 struct Rule {
-    using HandlerArg = std::variant<Token>;
+    using HandlerArg = std::variant<Token, AstNodePtr>;
     using HandlerArgs = std::vector<HandlerArg>;
     using HandlerType = std::function<AstNodePtr(AstBuilder& ast_builder, const HandlerArgs& args)>;
 
