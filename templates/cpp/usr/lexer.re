@@ -14,7 +14,7 @@ pg::TokenType pg::Lexer::GetTokenType(const char*& str_ptr, const char* end) {
         * { return TokenType::Unknown; }
 
         // Your rules here...
-        [1-9][0-9]* { return TokenType::Number; }
+        [0-9]+ { return TokenType::Number; }
         [ \n\s\t] { return TokenType::Skip; }
 
         "+" { return TokenType::Plus; }

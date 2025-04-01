@@ -19,4 +19,6 @@ add_executable(parsers_generator main.cpp
         core/generators/slr_generator.h
         core/code/cpp_generator.cpp
         core/code/cpp_generator.h
+        core/app/application.h
+        core/app/application.cpp
 )
