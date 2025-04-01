@@ -36,10 +36,14 @@ void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
     std::ofstream out(path + "/" + kGrammarFilename);
     out << "#pragma once\n";
     out << "#include \"../lib/grammar.h\"\n";
-    out << "#include \"" << kIdentifierFilename << "\"\n\n";
+    out << "#include \"" << kIdentifierFilename << "\"\n";
+    out << "#include \"" << kAstBuilderFilename << "\"\n\n";
     out << "namespace " << kNamespace << " {\n";
     out << "const " << kGrammarStructName << " " << kGrammarName << " = {{\n";
-    for (const grammar::Rule& rule : grammar_info_.GetGrammar().GetRules()) {
+    const auto& grammar = grammar_info_.GetGrammar();
+    const auto& rules = grammar.GetRules();
+    for (size_t i = 0; i < rules.size(); ++i) {
+        const auto& rule = rules[i];
         if (rule.name == grammar::GrammarInfo::kNewMainRuleName) {
             continue;
         }
@@ -51,7 +55,14 @@ void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
             WriteSymbol(out, symbol);
             out << ", ";
         }
-        out << "}},\n";
+        out << "},";
+        out << "[](" << kAstBuilderClassName << "& ast_builder, ";
+        out << "const " << kHandlerArgs << "& args){";
+        out << "return ast_builder.";
+        WriteMethodForRuleName(out, i);
+        out << "(args);";
+        out << "}";
+        out << "},\n";
     }
     out << "}};\n";
     out << "}\n";
@@ -155,7 +166,7 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
     out << "namespace " << kNamespace << " {\n";
     out << "class " << kAstBuilderClassName << " {\n";
     out << "public:\n";
-    out << "    virtual ~AstBuilder() {}\n\n";
+    out << "    virtual ~" << kAstBuilderClassName << "() {}\n\n";
     out << "    virtual void Setup() {};\n";
     out << "    virtual void Accept(" << kAstNodePtr << " root) = 0;\n";
     out << "    virtual void Error() = 0;\n\n";
@@ -166,13 +177,12 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
         if (identifier == grammar.GetMainRule()) {
             continue;
         }
-        for (size_t i = 0; i < rules.size(); ++i) {
-            const auto& rule = grammar.GetRule(rules[i]);
-            out << "    // " << rule << "\n";
+        for (size_t rule_index : rules) {
+            out << "    // " << grammar.GetRule(rule_index) << "\n";
             out << "    virtual " << kAstNodePtr << " ";
-            WriteMethodForRuleName(out, rule, i);
+            WriteMethodForRuleName(out, rule_index);
 
-            out << "(const Rule::HandlerArgs& args) = 0;\n";
+            out << "(const " << kHandlerArgs << "& args) = 0;\n";
         }
     }
 
@@ -194,7 +204,8 @@ void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::st
     out << "}\n";
 }
 
-void code::CppGenerator::WriteMethodForRuleName(std::ostream& out, const grammar::Rule& rule,
-                                                size_t number) {
-    out << "HandleRule_" << rule.name << "_" << (number + 1);
+void code::CppGenerator::WriteMethodForRuleName(std::ostream& out, size_t rule_index) {
+    const auto& grammar = grammar_info_.GetGrammar();
+    out << "HandleRule_" << grammar.GetRule(rule_index).name;
+    out << "_" << (grammar.GetRelativeIndex(rule_index) + 1);
 }

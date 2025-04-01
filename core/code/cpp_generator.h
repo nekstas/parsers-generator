@@ -19,7 +19,9 @@ private:
 
     static constexpr std::string kGrammarFilename = "grammar.h";
     static constexpr std::string kGrammarStructName = "Grammar";
+    static constexpr std::string kHandlerArgs = "Rule::HandlerArgs";
     static constexpr std::string kGrammarName = "kGrammar";
+
     static constexpr std::string kTablesFilename = "tables.h";
 
     static constexpr std::string kActionTableStructName = "LrActionTable";
@@ -54,7 +56,7 @@ private:
     void WriteSymbol(std::ostream& out, const grammar::Symbol& symbol);
     void WriteLrAction(std::ostream& out, const generators::LrAction& action);
     void WriteSizeTNumber(std::ostream& out, size_t number);
-    void WriteMethodForRuleName(std::ostream& out, const grammar::Rule& rule, size_t number);
+    void WriteMethodForRuleName(std::ostream& out, size_t rule);
 
 private:
     grammar::GrammarInfo grammar_info_;

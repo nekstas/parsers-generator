@@ -4,6 +4,7 @@ size_t grammar::Grammar::AddRule(const grammar::Rule& rule) {
     // TODO: add check if rule already exist
     size_t index = GetRulesCount();
     rules_.push_back(rule);
+    relative_index_.push_back(rules_for_name_[rule.name].size());
     rules_for_name_[rule.name].push_back(index);
     return index;
 }
@@ -34,6 +35,10 @@ const std::vector<size_t>& grammar::Grammar::GetRulesFor(const std::string& name
 
 const std::map<std::string, std::vector<size_t>>& grammar::Grammar::GetRulesMap() const {
     return rules_for_name_;
+}
+
+size_t grammar::Grammar::GetRelativeIndex(size_t index) const {
+    return relative_index_.at(index);
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::Symbol& symbol) {

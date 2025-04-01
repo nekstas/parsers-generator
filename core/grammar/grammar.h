@@ -31,6 +31,7 @@ class Grammar {
 public:
     size_t AddRule(const Rule& rule);
     const Rule& GetRule(size_t index) const;
+    size_t GetRelativeIndex(size_t index) const;
     void SetMainRule(const std::string& name);
     std::string GetMainRule() const;
     size_t GetRulesCount() const;
@@ -40,6 +41,7 @@ public:
 
 private:
     std::vector<Rule> rules_;
+    std::vector<size_t> relative_index_;
     std::map<std::string, std::vector<size_t>> rules_for_name_;
     std::string main_rule_;
 };
