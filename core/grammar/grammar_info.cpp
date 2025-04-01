@@ -38,7 +38,7 @@ void grammar::GrammarInfo::UpdateMainRule() {
     }
 
     grammar::Symbol symbol = {grammar::Symbol::Type::NonTerminal, old_main_rule};
-    grammar_.AddRule({kNewMainRuleName, {symbol}});
+    grammar_.AddRule({kNewMainRuleName, "", {symbol}, {true}});
     grammar_.SetMainRule(kNewMainRuleName);
 }
 

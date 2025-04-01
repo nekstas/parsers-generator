@@ -16,13 +16,33 @@ grammar::Symbol MakeNT(const std::string& name) {
 }
 
 int main() {
+    /*
+     [F: Number]
+     * $Number -> Number
+     * OpenBracket $<E> CloseBracket -> BracketExpression
+
+     [T: Number]
+     * $<T> Star $<F> -> MultiplyExpression
+     * $<F> -> F2T
+
+     [E: Number]
+     * $<E> Plus $<T> -> SumExpression
+     * $<T> -> T2E
+     * */
     grammar::Grammar grammar;
-    grammar.AddRule({"F", {MakeT("Number")}});
-    grammar.AddRule({"F", {MakeT("OpenBracket"), MakeNT("E"), MakeT("CloseBracket")}});
-    grammar.AddRule({"T", {MakeNT("T"), MakeT("Star"), MakeNT("F")}});
-    grammar.AddRule({"T", {MakeNT("F")}});
-    grammar.AddRule({"E", {MakeNT("E"), MakeT("Plus"), MakeNT("T")}});
-    grammar.AddRule({"E", {MakeNT("T")}});
+    grammar.AddRule({"F", "Number", {MakeT("Number")}, {true}});
+    grammar.AddRule({"F",
+                     "BracketExpression",
+                     {MakeT("OpenBracket"), MakeNT("E"), MakeT("CloseBracket")},
+                     {false, true, false}});
+    grammar.AddRule({"T",
+                     "MultiplyExpression",
+                     {MakeNT("T"), MakeT("Star"), MakeNT("F")},
+                     {true, false, true}});
+    grammar.AddRule({"T", "F2T", {MakeNT("F")}, {true}});
+    grammar.AddRule(
+        {"E", "SumExpression", {MakeNT("E"), MakeT("Plus"), MakeNT("T")}, {true, false, true}});
+    grammar.AddRule({"E", "T2E", {MakeNT("T")}, {true}});
     grammar.SetMainRule("E");
 
     grammar::GrammarInfo grammar_info(grammar);

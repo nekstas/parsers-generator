@@ -206,6 +206,5 @@ void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::st
 
 void code::CppGenerator::WriteMethodForRuleName(std::ostream& out, size_t rule_index) {
     const auto& grammar = grammar_info_.GetGrammar();
-    out << "HandleRule_" << grammar.GetRule(rule_index).name;
-    out << "_" << (grammar.GetRelativeIndex(rule_index) + 1);
+    out << "Handle" << grammar.GetRule(rule_index).handler_name;
 }
