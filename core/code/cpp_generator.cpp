@@ -38,12 +38,11 @@ void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
     out << "#include \"../lib/grammar.h\"\n";
     out << "#include \"" << kIdentifierFilename << "\"\n";
     out << "#include \"" << kAstBuilderFilename << "\"\n\n";
-    out << "namespace " << kNamespace << " {\n";
+    out << "namespace " << kMainNamespace << " {\n";
     out << "const " << kGrammarStructName << " " << kGrammarName << " = {{\n";
     const auto& grammar = grammar_info_.GetGrammar();
     const auto& rules = grammar.GetRules();
-    for (size_t i = 0; i < rules.size(); ++i) {
-        const auto& rule = rules[i];
+    for (const auto& rule : rules) {
         if (rule.name == grammar::GrammarInfo::kNewMainRuleName) {
             continue;
         }
@@ -59,7 +58,7 @@ void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
         out << "[](" << kAstBuilderClassName << "& ast_builder, ";
         out << "const " << kHandlerArgs << "& args){";
         out << "return ast_builder.";
-        WriteMethodForRuleName(out, i);
+        WriteMethodForRuleName(out, rule);
         out << "(args);";
         out << "}";
         out << "},\n";
@@ -73,7 +72,7 @@ void code::CppGenerator::GenerateTablesFile(const std::string& path) {
     out << "#pragma once\n";
     out << "#include \"../lib/lr_data.h\"\n";
     out << "#include \"" << kIdentifierFilename << "\"\n\n";
-    out << "namespace " << kNamespace << " {\n";
+    out << "namespace " << kMainNamespace << " {\n";
     GenerateActionTable(out);
     GenerateGotoTable(out);
     out << "}";
@@ -162,8 +161,16 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
     out << "#include <vector>\n";
     out << "#include \"../lib/ast_node.h\"\n";
     out << "#include \"../lib/grammar.h\"\n";
-    out << "#include \"../lib/token.h\"\n\n";
-    out << "namespace " << kNamespace << " {\n";
+    out << "#include \"../lib/token.h\"\n";
+    out << "#include \"../usr/ast_nodes.h\"\n\n";
+
+    out << "namespace " << kAstNamespace << " {\n";
+    for (const std::string& return_type : grammar_info_.GetUsedReturnTypes()) {
+        out << "class " << return_type << ";\n";
+    }
+    out << "}\n\n";
+
+    out << "namespace " << kMainNamespace << " {\n";
     out << "class " << kAstBuilderClassName << " {\n";
     out << "public:\n";
     out << "    virtual ~" << kAstBuilderClassName << "() {}\n\n";
@@ -178,9 +185,11 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
             continue;
         }
         for (size_t rule_index : rules) {
-            out << "    // " << grammar.GetRule(rule_index) << "\n";
-            out << "    virtual " << kAstNodePtr << " ";
-            WriteMethodForRuleName(out, rule_index);
+            const auto& rule = grammar.GetRule(rule_index);
+            out << "    virtual std::shared_ptr<";
+            WriteMethodReturnType(out, rule);
+            out << "> ";
+            WriteMethodForRuleName(out, rule);
 
             out << "(const " << kHandlerArgs << "& args) = 0;\n";
         }
@@ -195,7 +204,7 @@ void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::st
     std::ofstream out(path);
     out << "#pragma once\n";
     out << "#include <cstdint>\n\n";
-    out << "namespace " << kNamespace << " {\n";
+    out << "namespace " << kMainNamespace << " {\n";
     out << "enum class " << enum_name << " : size_t { ";
     for (const std::string& name : values) {
         out << name << ", ";
@@ -204,7 +213,10 @@ void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::st
     out << "}\n";
 }
 
-void code::CppGenerator::WriteMethodForRuleName(std::ostream& out, size_t rule_index) {
-    const auto& grammar = grammar_info_.GetGrammar();
-    out << "Handle" << grammar.GetRule(rule_index).handler_name;
+void code::CppGenerator::WriteMethodForRuleName(std::ostream& out, const grammar::Rule& rule) {
+    out << "Handle" << rule.handler_name;
+}
+
+void code::CppGenerator::WriteMethodReturnType(std::ostream& out, const grammar::Rule& rule) {
+    out << kAstNamespace << "::" << grammar_info_.GetGrammar().GetReturnType(rule.name);
 }

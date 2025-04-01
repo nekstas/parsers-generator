@@ -36,7 +36,7 @@ void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast
             states.push_back(data_.goto_table.at(states.back()).at(rule.result));
             result_stack.push_back(rule.handler(ast_builder, args));
         } else if (action.type == LrAction::Type::ACCEPT) {
-            ast_builder.Accept(std::get<AstNodePtr>(result_stack.back()));
+            ast_builder.Accept(std::get<ast::AstNodePtr>(result_stack.back()));
             break;
         } else {
             // Todo error action

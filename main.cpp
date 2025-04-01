@@ -43,6 +43,9 @@ int main() {
     grammar.AddRule(
         {"E", "SumExpression", {MakeNT("E"), MakeT("Plus"), MakeNT("T")}, {true, false, true}});
     grammar.AddRule({"E", "T2E", {MakeNT("T")}, {true}});
+    grammar.SetReturnType("T", "Number");
+    grammar.SetReturnType("F", "Number");
+    grammar.SetReturnType("E", "Number");
     grammar.SetMainRule("E");
 
     grammar::GrammarInfo grammar_info(grammar);

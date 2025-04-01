@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace pg {
+namespace ast {
 
 class AstNode {
 public:
@@ -11,8 +11,6 @@ public:
 };
 
 using AstNodePtr = std::shared_ptr<AstNode>;
-
-namespace ast {
 
 template <typename T, typename... Args>
 std::shared_ptr<T> Make(Args&&... args) {
@@ -25,5 +23,3 @@ std::shared_ptr<T> As(AstNodePtr node) {
 }
 
 }  // namespace ast
-
-}  // namespace pg

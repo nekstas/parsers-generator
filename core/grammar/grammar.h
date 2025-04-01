@@ -37,6 +37,8 @@ public:
     size_t AddRule(const Rule& rule);
     const Rule& GetRule(size_t index) const;
     void SetMainRule(const std::string& name);
+    void SetReturnType(const std::string& name, const std::string& return_type);
+    std::string GetReturnType(const std::string& name) const;
     std::string GetMainRule() const;
     size_t GetRulesCount() const;
     const std::vector<Rule>& GetRules() const;
@@ -47,6 +49,7 @@ private:
     std::vector<Rule> rules_;
     std::map<std::string, std::vector<size_t>> rules_for_name_;
     std::string main_rule_;
+    std::map<std::string, std::string> return_types_;
 };
 
 }  // namespace grammar

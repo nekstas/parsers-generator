@@ -6,7 +6,8 @@ namespace code {
 
 class CppGenerator {
 private:
-    static constexpr std::string kNamespace = "pg";
+    static constexpr std::string kMainNamespace = "pg";
+    static constexpr std::string kAstNamespace = "ast";
     static constexpr std::string kDataPath = "/data";
 
     static constexpr std::string kIdentifierFilename = "identifier.h";
@@ -32,7 +33,7 @@ private:
 
     static constexpr std::string kAstBuilderFilename = "ast_builder.h";
     static constexpr std::string kAstBuilderClassName = "AstBuilder";
-    static constexpr std::string kAstNodePtr = "AstNodePtr";
+    static constexpr std::string kAstNodePtr = "ast::AstNodePtr";
 
 public:
     CppGenerator(const grammar::GrammarInfo& grammar_info, const generators::LrTables& tables);
@@ -56,7 +57,8 @@ private:
     void WriteSymbol(std::ostream& out, const grammar::Symbol& symbol);
     void WriteLrAction(std::ostream& out, const generators::LrAction& action);
     void WriteSizeTNumber(std::ostream& out, size_t number);
-    void WriteMethodForRuleName(std::ostream& out, size_t rule);
+    void WriteMethodForRuleName(std::ostream& out, const grammar::Rule& rule);
+    void WriteMethodReturnType(std::ostream& out, const grammar::Rule& rule);
 
 private:
     grammar::GrammarInfo grammar_info_;

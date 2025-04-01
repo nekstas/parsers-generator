@@ -44,6 +44,7 @@ void grammar::GrammarInfo::UpdateMainRule() {
 
 void grammar::GrammarInfo::BuildUsedSets() {
     for (const grammar::Rule& rule : grammar_.GetRules()) {
+        AddUsedReturnTypeFor(rule.name);
         for (const grammar::Symbol& symbol : rule.sequence) {
             AddUsedSymbol(symbol);
         }
@@ -164,6 +165,16 @@ bool grammar::GrammarInfo::MoveTokens(const std::set<std::string>& values,
 
 const std::set<std::string>& grammar::GrammarInfo::GetFollow(const std::string& name) const {
     return follow_.at(name);
+}
+
+void grammar::GrammarInfo::AddUsedReturnTypeFor(const std::string& name) {
+    if (name != kNewMainRuleName) {
+        used_return_types_.insert(grammar_.GetReturnType(name));
+    }
+}
+
+const std::set<std::string>& grammar::GrammarInfo::GetUsedReturnTypes() const {
+    return used_return_types_;
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::GrammarInfo& info) {
