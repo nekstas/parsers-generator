@@ -1,9 +1,12 @@
 #pragma once
 
+#include <functional>
 #include <variant>
 #include <vector>
 
 #include "../data/identifier.h"
+#include "../lib/ast_node.h"
+#include "../lib/token.h"
 #include "../usr/lexer.h"
 
 namespace pg {
@@ -11,9 +14,13 @@ namespace pg {
 using Symbol = std::variant<TokenType, Identifier>;
 
 struct Rule {
+    using HandlerArg = std::variant<Token>;
+    using HandlerArgs = std::vector<HandlerArg>;
+    using HandlerType = std::function<AstNodePtr(const HandlerArgs& args)>;
+
     Identifier result;
-    std::string repr;
     std::vector<Symbol> sequence;
+    HandlerType handler;
 };
 
 struct Grammar {

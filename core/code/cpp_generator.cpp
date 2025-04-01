@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+// TODO: Handle errors with files
+
 code::CppGenerator::CppGenerator(const grammar::GrammarInfo& grammar_info,
                                  const generators::LrTables& tables)
     : grammar_info_(grammar_info), tables_(tables) {
@@ -36,7 +38,7 @@ void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
     out << "#include \"../lib/grammar.h\"\n";
     out << "#include \"" << kIdentifierFilename << "\"\n\n";
     out << "namespace " << kNamespace << " {\n";
-    out << "const Grammar " << kGrammarName << " = {{\n";
+    out << "const " << kGrammarStructName << " " << kGrammarName << " = {{\n";
     for (const grammar::Rule& rule : grammar_info_.GetGrammar().GetRules()) {
         if (rule.name == grammar::GrammarInfo::kNewMainRuleName) {
             continue;
@@ -44,9 +46,10 @@ void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
 
         out << "{";
         WriteIdentifier(out, rule.name);
-        out << ", \"" << rule << "\", {";
+        out << ", {";
         for (const grammar::Symbol& symbol : rule.sequence) {
-            WriteSymbol(out, symbol) << ", ";
+            WriteSymbol(out, symbol);
+            out << ", ";
         }
         out << "}},\n";
     }
@@ -66,7 +69,7 @@ void code::CppGenerator::GenerateTablesFile(const std::string& path) {
 }
 
 void code::CppGenerator::GenerateActionTable(std::ostream& out) {
-    out << "const LrActionTable " << kActionTableName << " = {\n";
+    out << "const " << kActionTableStructName << " " << kActionTableName << " = {\n";
     for (size_t i = 0; i < tables_.action_table.size(); ++i) {
         out << "{";
         for (const auto& [name, action] : tables_.action_table[i]) {
@@ -82,7 +85,7 @@ void code::CppGenerator::GenerateActionTable(std::ostream& out) {
 }
 
 void code::CppGenerator::GenerateGotoTable(std::ostream& out) {
-    out << "const LrGotoTable " << kGotoTableName << " = {\n";
+    out << "const " << kGotoTableStructName << " " << kGotoTableName << " = {\n";
     for (size_t i = 0; i < tables_.goto_table.size(); ++i) {
         out << "{";
         for (const auto& [name, new_state] : tables_.goto_table[i]) {
@@ -97,26 +100,23 @@ void code::CppGenerator::GenerateGotoTable(std::ostream& out) {
     out << "\n};\n";
 }
 
-std::ostream& code::CppGenerator::WriteIdentifier(std::ostream& out, const std::string& name) {
+void code::CppGenerator::WriteIdentifier(std::ostream& out, const std::string& name) {
     out << kIdentifierEnumName << "::" << name;
-    return out;
 }
 
-std::ostream& code::CppGenerator::WriteToken(std::ostream& out, const std::string& name) {
+void code::CppGenerator::WriteToken(std::ostream& out, const std::string& name) {
     out << kTokenTypeEnumName << "::" << name;
-    return out;
 }
 
-std::ostream& code::CppGenerator::WriteSymbol(std::ostream& out, const grammar::Symbol& symbol) {
+void code::CppGenerator::WriteSymbol(std::ostream& out, const grammar::Symbol& symbol) {
     if (symbol.type == grammar::Symbol::Type::Terminal) {
-        return WriteToken(out, symbol.value);
+        WriteToken(out, symbol.value);
     } else {
-        return WriteIdentifier(out, symbol.value);
+        WriteIdentifier(out, symbol.value);
     }
 }
 
-std::ostream& code::CppGenerator::WriteLrAction(std::ostream& out,
-                                                const generators::LrAction& action) {
+void code::CppGenerator::WriteLrAction(std::ostream& out, const generators::LrAction& action) {
     out << "{";
     switch (action.type) {
         case generators::LrAction::Type::SHIFT:
@@ -135,18 +135,61 @@ std::ostream& code::CppGenerator::WriteLrAction(std::ostream& out,
     out << ", ";
     WriteSizeTNumber(out, action.index);
     out << "}";
-    return out;
 }
 
-std::ostream& code::CppGenerator::WriteSizeTNumber(std::ostream& out, size_t number) {
+void code::CppGenerator::WriteSizeTNumber(std::ostream& out, size_t number) {
     if (number == -1) {
-        return out << "-1";
+        out << "-1";
     } else {
-        return out << number;
+        out << number;
     }
 }
 
 void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
+    std::ofstream out(path + "/" + kAstBuilderFilename);
+    out << "#pragma once\n";
+    out << "#include <vector>\n";
+    out << "#include \"../lib/ast_node.h\"\n";
+    out << "#include \"../lib/token.h\"\n\n";
+    out << "namespace " << kNamespace << " {\n";
+    out << "class " << kAstBuilderClassName << " {\n";
+    out << "public:\n";
+    out << "    virtual ~AstBuilder() {}\n\n";
+    out << "    virtual void Setup() {};\n";
+    out << "    virtual void Accept(" << kAstNodePtr << " root) = 0;\n";
+    out << "    virtual void Error() = 0;\n\n";
+
+    const auto& grammar = grammar_info_.GetGrammar();
+    const auto& rules_map = grammar.GetRulesMap();
+    for (const auto& [identifier, rules] : rules_map) {
+        if (identifier == grammar.GetMainRule()) {
+            continue;
+        }
+        for (size_t i = 0; i < rules.size(); ++i) {
+            const auto& rule = grammar.GetRule(rules[i]);
+            out << "    // " << rule << "\n";
+            out << "    virtual " << kAstNodePtr << " ";
+            WriteMethodForRuleName(out, rule, i);
+
+            out << "(";
+            for (const auto& symbol : rule.sequence) {
+                if (symbol.type == grammar::Symbol::Type::Terminal) {
+                    out << "const Token&";
+                } else {
+                    out << kAstNodePtr;
+                }
+                if (&symbol != &rule.sequence.back()) {
+                    out << ", ";
+                }
+            }
+            out << ") = 0;\n";
+
+            //            out << "(const std::vector<AstNodePtr>& stack) = 0;\n";
+        }
+    }
+
+    out << "};\n";
+    out << "}";
 }
 
 void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::string& enum_name,
@@ -161,4 +204,9 @@ void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::st
     }
     out << "};\n";
     out << "}\n";
+}
+
+void code::CppGenerator::WriteMethodForRuleName(std::ostream& out, const grammar::Rule& rule,
+                                                size_t number) {
+    out << "HandleRule" << rule.name << "_" << (number + 1);
 }

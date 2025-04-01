@@ -18,11 +18,19 @@ private:
     static constexpr std::string kUnknownTokenName = "Unknown";
 
     static constexpr std::string kGrammarFilename = "grammar.h";
+    static constexpr std::string kGrammarStructName = "Grammar";
     static constexpr std::string kGrammarName = "kGrammar";
-
     static constexpr std::string kTablesFilename = "tables.h";
+
+    static constexpr std::string kActionTableStructName = "LrActionTable";
     static constexpr std::string kActionTableName = "kActionTable";
+
+    static constexpr std::string kGotoTableStructName = "LrGotoTable";
     static constexpr std::string kGotoTableName = "kGotoTable";
+
+    static constexpr std::string kAstBuilderFilename = "ast_builder.h";
+    static constexpr std::string kAstBuilderClassName = "AstBuilder";
+    static constexpr std::string kAstNodePtr = "AstNodePtr";
 
 public:
     CppGenerator(const grammar::GrammarInfo& grammar_info, const generators::LrTables& tables);
@@ -41,11 +49,12 @@ private:
                           const std::set<std::string>& values);
 
 private:
-    std::ostream& WriteIdentifier(std::ostream& out, const std::string& name);
-    std::ostream& WriteToken(std::ostream& out, const std::string& name);
-    std::ostream& WriteSymbol(std::ostream& out, const grammar::Symbol& symbol);
-    std::ostream& WriteLrAction(std::ostream& out, const generators::LrAction& action);
-    std::ostream& WriteSizeTNumber(std::ostream& out, size_t number);
+    void WriteIdentifier(std::ostream& out, const std::string& name);
+    void WriteToken(std::ostream& out, const std::string& name);
+    void WriteSymbol(std::ostream& out, const grammar::Symbol& symbol);
+    void WriteLrAction(std::ostream& out, const generators::LrAction& action);
+    void WriteSizeTNumber(std::ostream& out, size_t number);
+    void WriteMethodForRuleName(std::ostream& out, const grammar::Rule& rule, size_t number);
 
 private:
     grammar::GrammarInfo grammar_info_;
