@@ -59,7 +59,29 @@ void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
         out << "const " << kHandlerArgs << "& args){";
         out << "return ast_builder.";
         WriteMethodForRuleName(out, rule);
-        out << "(args);";
+
+        out << "(";
+        bool is_first = true;
+        for (size_t i = 0; i < rule.sequence.size(); ++i) {
+            if (!rule.take[i]) {
+                continue;
+            }
+            if (!is_first) {
+                out << ", ";
+            }
+            if (rule.sequence[i].type == grammar::Symbol::Type::Terminal) {
+                out << "std::get<" << kTokenStruct << ">(args[" << i << "])";
+            } else {
+                out << "ast::As<";
+                WriteMethodReturnType(out, rule.sequence[i].value);
+                out << ">(";
+                out << "std::get<" << kAstNodePtr << ">(args[" << i << "])";
+                out << ")";
+            }
+            is_first = false;
+        }
+        out << ");";
+
         out << "}";
         out << "},\n";
     }
@@ -186,12 +208,28 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
         }
         for (size_t rule_index : rules) {
             const auto& rule = grammar.GetRule(rule_index);
-            out << "    virtual std::shared_ptr<";
-            WriteMethodReturnType(out, rule);
-            out << "> ";
+            out << "    virtual ";
+            WriteMethodReturnTypePtr(out, rule.name);
+            out << " ";
             WriteMethodForRuleName(out, rule);
 
-            out << "(const " << kHandlerArgs << "& args) = 0;\n";
+            out << "(";
+            bool is_first = true;
+            for (size_t i = 0; i < rule.sequence.size(); ++i) {
+                if (!rule.take[i]) {
+                    continue;
+                }
+                if (!is_first) {
+                    out << ", ";
+                }
+                if (rule.sequence[i].type == grammar::Symbol::Type::Terminal) {
+                    out << "const Token&";
+                } else {
+                    WriteMethodReturnTypePtr(out, rule.sequence[i].value);
+                }
+                is_first = false;
+            }
+            out << ") = 0;\n";
         }
     }
 
@@ -217,6 +255,12 @@ void code::CppGenerator::WriteMethodForRuleName(std::ostream& out, const grammar
     out << "Handle" << rule.handler_name;
 }
 
-void code::CppGenerator::WriteMethodReturnType(std::ostream& out, const grammar::Rule& rule) {
-    out << kAstNamespace << "::" << grammar_info_.GetGrammar().GetReturnType(rule.name);
+void code::CppGenerator::WriteMethodReturnType(std::ostream& out, const std::string& name) {
+    out << kAstNamespace << "::" << grammar_info_.GetGrammar().GetReturnType(name);
+}
+
+void code::CppGenerator::WriteMethodReturnTypePtr(std::ostream& out, const std::string& name) {
+    out << "std::shared_ptr<";
+    WriteMethodReturnType(out, name);
+    out << ">";
 }

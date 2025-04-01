@@ -34,6 +34,7 @@ private:
     static constexpr std::string kAstBuilderFilename = "ast_builder.h";
     static constexpr std::string kAstBuilderClassName = "AstBuilder";
     static constexpr std::string kAstNodePtr = "ast::AstNodePtr";
+    static constexpr std::string kTokenStruct = "Token";
 
 public:
     CppGenerator(const grammar::GrammarInfo& grammar_info, const generators::LrTables& tables);
@@ -58,7 +59,8 @@ private:
     void WriteLrAction(std::ostream& out, const generators::LrAction& action);
     void WriteSizeTNumber(std::ostream& out, size_t number);
     void WriteMethodForRuleName(std::ostream& out, const grammar::Rule& rule);
-    void WriteMethodReturnType(std::ostream& out, const grammar::Rule& rule);
+    void WriteMethodReturnType(std::ostream& out, const std::string& name);
+    void WriteMethodReturnTypePtr(std::ostream& out, const std::string& name);
 
 private:
     grammar::GrammarInfo grammar_info_;
