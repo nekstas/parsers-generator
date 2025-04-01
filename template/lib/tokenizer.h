@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "../lexer.h"
+#include "../usr/lexer.h"
+#include "token.h"
 
 namespace pg {
 

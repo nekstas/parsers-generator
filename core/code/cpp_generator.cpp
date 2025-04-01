@@ -9,31 +9,32 @@ code::CppGenerator::CppGenerator(const grammar::GrammarInfo& grammar_info,
 
 void code::CppGenerator::Generate(const std::string& path) {
     std::string data_path = path + kDataPath;
-    GenerateIdentifiers(data_path);
-    GenerateGrammar(data_path);
-    GenerateTables(data_path);
+    GenerateIdentifierFile(data_path);
+    GenerateTokenTypeFile(data_path);
+    GenerateGrammarFile(data_path);
+    GenerateTablesFile(data_path);
+    GenerateAstBuilderFile(data_path);
 }
 
-void code::CppGenerator::GenerateIdentifiers(const std::string& path) {
-    std::ofstream out(path + "/" + kIdentifiersFilename);
+void code::CppGenerator::GenerateIdentifierFile(const std::string& path) {
     const std::string& main_rule = grammar_info_.GetGrammar().GetMainRule();
-    out << "#pragma once\n\n";
-    out << "namespace " << kNamespace << " {\n";
-    out << "enum class " << kIdentifierEnumName << " { ";
-    for (const std::string& identifier : grammar_info_.GetUsedRules()) {
-        if (identifier != main_rule) {
-            out << identifier << ", ";
-        }
-    }
-    out << "};\n";
-    out << "}\n";
+    auto values = grammar_info_.GetUsedRules();
+    values.erase(main_rule);
+    GenerateEnumFile(path + "/" + kIdentifierFilename, kIdentifierEnumName, values);
 }
 
-void code::CppGenerator::GenerateGrammar(const std::string& path) {
+void code::CppGenerator::GenerateTokenTypeFile(const std::string& path) {
+    auto values = grammar_info_.GetUsedTokens();
+    values.insert(kSkipTokenName);
+    values.insert(kUnknownTokenName);
+    GenerateEnumFile(path + "/" + kTokenTypeFilename, kTokenTypeEnumName, values);
+}
+
+void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
     std::ofstream out(path + "/" + kGrammarFilename);
     out << "#pragma once\n";
     out << "#include \"../lib/grammar.h\"\n";
-    out << "#include \"" << kIdentifiersFilename << "\"\n\n";
+    out << "#include \"" << kIdentifierFilename << "\"\n\n";
     out << "namespace " << kNamespace << " {\n";
     out << "const Grammar " << kGrammarName << " = {{\n";
     for (const grammar::Rule& rule : grammar_info_.GetGrammar().GetRules()) {
@@ -53,11 +54,11 @@ void code::CppGenerator::GenerateGrammar(const std::string& path) {
     out << "}\n";
 }
 
-void code::CppGenerator::GenerateTables(const std::string& path) {
+void code::CppGenerator::GenerateTablesFile(const std::string& path) {
     std::ofstream out(path + "/" + kTablesFilename);
     out << "#pragma once\n";
     out << "#include \"../lib/lr_data.h\"\n";
-    out << "#include \"" << kIdentifiersFilename << "\"\n\n";
+    out << "#include \"" << kIdentifierFilename << "\"\n\n";
     out << "namespace " << kNamespace << " {\n";
     GenerateActionTable(out);
     GenerateGotoTable(out);
@@ -102,7 +103,7 @@ std::ostream& code::CppGenerator::WriteIdentifier(std::ostream& out, const std::
 }
 
 std::ostream& code::CppGenerator::WriteToken(std::ostream& out, const std::string& name) {
-    out << kTokenTypeName << "::" << name;
+    out << kTokenTypeEnumName << "::" << name;
     return out;
 }
 
@@ -143,4 +144,21 @@ std::ostream& code::CppGenerator::WriteSizeTNumber(std::ostream& out, size_t num
     } else {
         return out << number;
     }
+}
+
+void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
+}
+
+void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::string& enum_name,
+                                          const std::set<std::string>& values) {
+    std::ofstream out(path);
+    out << "#pragma once\n";
+    out << "#include <cstdint>\n\n";
+    out << "namespace " << kNamespace << " {\n";
+    out << "enum class " << enum_name << " : size_t { ";
+    for (const std::string& name : values) {
+        out << name << ", ";
+    }
+    out << "};\n";
+    out << "}\n";
 }

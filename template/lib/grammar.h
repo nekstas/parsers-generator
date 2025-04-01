@@ -3,8 +3,8 @@
 #include <variant>
 #include <vector>
 
-#include "../data/identifiers.h"
-#include "../lexer.h"
+#include "../data/identifier.h"
+#include "../usr/lexer.h"
 
 namespace pg {
 

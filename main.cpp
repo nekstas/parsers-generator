@@ -4,8 +4,6 @@
 #include "core/generators/slr_generator.h"
 #include "core/grammar/grammar.h"
 #include "core/grammar/grammar_info.h"
-#include "template/data/grammar.h"
-#include "template/data/tables.h"
 #include "template/lib/parser.h"
 #include "template/lib/tokenizer.h"
 
@@ -42,10 +40,10 @@ int main() {
 
     std::cerr << "Tokens:\n";
     for (auto token : result.tokens) {
-        std::cerr << "[type=" << static_cast<size_t>(token.GetTokenType());
-        std::cerr << "|value=" << token.GetValue();
-        std::cerr << "|line=" << token.GetLine() + 1;
-        std::cerr << "|pos=" << token.GetPos() + 1;
+        std::cerr << "[type=" << static_cast<size_t>(token.type);
+        std::cerr << "|value=" << token.value;
+        std::cerr << "|line=" << token.line + 1;
+        std::cerr << "|pos=" << token.pos + 1;
         std::cerr << "]\n";
     }
 
@@ -57,8 +55,8 @@ int main() {
     }
     std::cerr << "\n";
 
-    pg::LrParser parser({pg::kGrammar, pg::kActionTable, pg::kGotoTable});
-    parser.Parse(result.tokens);
+    pg::LrParser parser = pg::LrParser::Create();
+    //    parser.Parse(result.tokens);
 
     return 0;
 }

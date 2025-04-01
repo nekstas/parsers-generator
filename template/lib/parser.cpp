@@ -2,11 +2,16 @@
 
 #include <iostream>
 
+#include "../data/grammar.h"
+#include "../data/tables.h"
+
 pg::LrParser::LrParser(const pg::LrData& data) : data_(data) {
 }
 
-void pg::LrParser::Parse(const std::vector<Token>& tokens) {
-    if (tokens.empty() || tokens.back().GetTokenType() != TokenType::Eof) {
+void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast_builder) {
+    const auto& tokens = input.tokens;
+
+    if (tokens.empty() || tokens.back().type != TokenType::Eof) {
         // TODO: throw an error
         throw std::logic_error{"Incorrect sequence of tokens from tokenizer"};
     }
@@ -16,7 +21,7 @@ void pg::LrParser::Parse(const std::vector<Token>& tokens) {
         size_t current_state = states.back();
         Token current_token = tokens.at(i);
 
-        LrAction action = data_.action_table.at(current_state).at(current_token.GetTokenType());
+        LrAction action = data_.action_table.at(current_state).at(current_token.type);
         if (action.type == LrAction::Type::SHIFT) {
             states.push_back(action.index);
             ++i;
@@ -36,4 +41,8 @@ void pg::LrParser::Parse(const std::vector<Token>& tokens) {
             throw std::runtime_error{"Error while parsing input."};
         }
     }
+}
+
+pg::LrParser pg::LrParser::Create() {
+    return pg::LrParser({kGrammar, kActionTable, kGotoTable});
 }
