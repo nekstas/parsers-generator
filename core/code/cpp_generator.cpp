@@ -198,7 +198,9 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
     out << "    virtual ~" << kAstBuilderClassName << "() {}\n\n";
     out << "    virtual void Setup() {};\n";
     out << "    virtual void Accept(" << kAstNodePtr << " root) = 0;\n";
-    out << "    virtual void Error() = 0;\n\n";
+    out << "    virtual void Error(const Tokenizer::Result& input, size_t error_index) {\n";
+    out << "        ErrorPrinter::UnexpectedToken(input, error_index);\n";
+    out << "    }\n\n";
 
     const auto& grammar = grammar_info_.GetGrammar();
     const auto& rules_map = grammar.GetRulesMap();

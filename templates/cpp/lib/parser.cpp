@@ -10,8 +10,7 @@ void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast
     const auto& tokens = input.tokens;
 
     if (tokens.empty() || tokens.back().type != TokenType::Eof) {
-        // TODO: throw an error
-        throw std::logic_error{"Incorrect sequence of tokens from tokenizer"};
+        throw std::logic_error{"The parser received an incorrect list of tokens."};
     }
 
     std::vector<size_t> states = {0};
@@ -35,12 +34,13 @@ void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast
             }
             states.push_back(data_.goto_table.at(states.back()).at(rule.result));
             result_stack.push_back(rule.handler(ast_builder, args));
-        } else if (action.type == LrAction::Type::ACCEPT) {
-            ast_builder.Accept(std::get<ast::AstNodePtr>(result_stack.back()));
-            break;
         } else {
-            // Todo error action
-            throw std::runtime_error{"Error while parsing input."};
+            if (action.type == LrAction::Type::ACCEPT) {
+                ast_builder.Accept(std::get<ast::AstNodePtr>(result_stack.back()));
+            } else {
+                ast_builder.Error(input, i);
+            }
+            break;
         }
     }
 }
