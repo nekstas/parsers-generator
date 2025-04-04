@@ -32,23 +32,67 @@ grammar::Symbol MakeNT(const std::string& name) {
 
 void Application::GenerateParser(const std::string& grammar_file, const std::string& output_path) {
     grammar::Grammar grammar;
-    grammar.AddRule({"F", "Number", {MakeT("Number")}, {true}});
-    grammar.AddRule({"F",
-                     "BracketExpression",
-                     {MakeT("OpenBracket"), MakeNT("E"), MakeT("CloseBracket")},
+
+    grammar.SetReturnType("Symbol", "Symbol");
+    grammar.AddRule({"Symbol", "Terminal", {MakeT("Name")}, {true}});
+    grammar.AddRule({"Symbol",
+                     "NonTerminal",
+                     {MakeT("OpenTr"), MakeT("Name"), MakeT("CloseTr")},
                      {false, true, false}});
-    grammar.AddRule({"T",
-                     "MultiplyExpression",
-                     {MakeNT("T"), MakeT("Star"), MakeNT("F")},
-                     {true, false, true}});
-    grammar.AddRule({"T", "F2T", {MakeNT("F")}, {true}});
+
+    grammar.SetReturnType("TakeSymbol", "TakeSymbol");
+    grammar.AddRule({"TakeSymbol", "DontTakeSymbol", {MakeNT("Symbol")}, {true}});
     grammar.AddRule(
-        {"E", "SumExpression", {MakeNT("E"), MakeT("Plus"), MakeNT("T")}, {true, false, true}});
-    grammar.AddRule({"E", "T2E", {MakeNT("T")}, {true}});
-    grammar.SetReturnType("T", "Number");
-    grammar.SetReturnType("F", "Number");
-    grammar.SetReturnType("E", "Number");
-    grammar.SetMainRule("E");
+        {"TakeSymbol", "TakeSymbol", {MakeT("Dollar"), MakeNT("Symbol")}, {false, true}});
+
+    grammar.SetReturnType("SequenceOfSymbols", "SequenceOfSymbols");
+    grammar.AddRule(
+        {"SequenceOfSymbols", "SequenceOfSymbolsBegin", {MakeNT("TakeSymbol")}, {true}});
+    grammar.AddRule({"SequenceOfSymbols",
+                     "SequenceOfSymbolsContinue",
+                     {MakeNT("SequenceOfSymbols"), MakeNT("TakeSymbol")},
+                     {true, true}});
+
+    grammar.SetReturnType("Production", "Production");
+    grammar.AddRule({"Production",
+                     "Production",
+                     {MakeNT("SequenceOfSymbols"), MakeT("ArrowRight"), MakeT("Name")},
+                     {true, false, true}});
+
+    grammar.SetReturnType("ProductionList", "ProductionList");
+    grammar.AddRule({"ProductionList", "ProductionListBegin", {MakeNT("Production")}, {true}});
+    grammar.AddRule({"ProductionList",
+                     "ProductionListContinue",
+                     {MakeNT("ProductionList"), MakeNT("Production")},
+                     {true, true}});
+
+    grammar.SetReturnType("RuleHeader", "RuleHeader");
+    grammar.AddRule({"RuleHeader",
+                     "CommonRuleHeader",
+                     {MakeT("OpenSq"), MakeT("Name"), MakeT("CloseSq")},
+                     {false, true, false}});
+    grammar.AddRule(
+        {"RuleHeader",
+         "TypedRuleHeader",
+         {MakeT("OpenSq"), MakeT("Name"), MakeT("Colon"), MakeT("Name"), MakeT("CloseSq")},
+         {false, true, false, true, false}});
+
+    grammar.SetReturnType("Rule", "Rule");
+    grammar.AddRule(
+        {"Rule", "CommonRule", {MakeNT("RuleHeader"), MakeNT("ProductionList")}, {true, true}});
+    grammar.AddRule({"Rule",
+                     "MainRule",
+                     {MakeT("Dog"), MakeNT("RuleHeader"), MakeNT("ProductionList")},
+                     {true, true}});
+
+    grammar.SetReturnType("RuleList", "RuleList");
+    grammar.AddRule({"RuleList", "RuleListBegin", {MakeNT("Rule")}, {true}});
+    grammar.AddRule(
+        {"RuleList", "RuleListContinue", {MakeNT("RuleList"), MakeNT("Rule")}, {true, true}});
+
+    grammar.SetReturnType("Grammar", "Grammar");
+    grammar.AddRule({"Grammar", "Grammar", {MakeNT("RuleList")}, {true}});
+    grammar.SetMainRule("Grammar");
 
     grammar::GrammarInfo grammar_info(grammar);
     std::cerr << grammar_info << "\n";
@@ -58,7 +102,7 @@ void Application::GenerateParser(const std::string& grammar_file, const std::str
 
     generators::LrTables tables = generator.GenerateTables();
     code::CppGenerator code_gen(grammar_info, tables);
-    code_gen.Generate("../templates/cpp");
+    code_gen.Generate(output_path);
 }
 
 void Application::PrintHelpMessage() {
