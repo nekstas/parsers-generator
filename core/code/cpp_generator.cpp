@@ -3,6 +3,9 @@
 #include <fstream>
 
 // TODO: Handle errors with files
+// TODO: Create folders if necessary
+// TODO: Move lib files
+// TODO: Think about usr/lexer and usr/ast_nodes templates
 
 code::CppGenerator::CppGenerator(const grammar::GrammarInfo& grammar_info,
                                  const generators::LrTables& tables)
@@ -184,7 +187,9 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
     out << "#include \"../lib/ast_node.h\"\n";
     out << "#include \"../lib/grammar.h\"\n";
     out << "#include \"../lib/token.h\"\n";
-    out << "#include \"../usr/ast_nodes.h\"\n\n";
+    out << "#include \"../lib/tokenizer.h\"\n";
+    out << "#include \"../lib/error_printer.h\"\n\n";
+    out << "#include \"../usr/ast_nodes.h\"\n";
 
     out << "namespace " << kAstNamespace << " {\n";
     for (const std::string& return_type : grammar_info_.GetUsedReturnTypes()) {
