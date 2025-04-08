@@ -1,7 +1,6 @@
 #include "grammar.h"
 
 size_t grammar::Grammar::AddRule(const grammar::Rule& rule) {
-    // TODO: add check if rule already exist
     size_t index = GetRulesCount();
     rules_.push_back(rule);
     rules_for_name_[rule.name].push_back(index);

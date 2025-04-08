@@ -10,6 +10,7 @@ public:
     }
 
     virtual void Create(const std::string& path) = 0;
+    virtual void Update(const std::string& path) = 0;
 };
 
 }  // namespace code

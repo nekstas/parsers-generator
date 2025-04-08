@@ -14,13 +14,6 @@ pg::TokenType pg::Lexer::GetTokenType(const char*& str_ptr, const char* end) {
         * { return TokenType::Unknown; }
 
         // Your rules here...
-        [0-9]+ { return TokenType::Number; }
-        [ \n\s\t] { return TokenType::Skip; }
-
-        "+" { return TokenType::Plus; }
-        "*" { return TokenType::Star; }
-        "(" { return TokenType::OpenBracket; }
-        ")" { return TokenType::CloseBracket; }
 
     */
     // NOLINTEND

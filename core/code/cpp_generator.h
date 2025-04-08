@@ -34,6 +34,7 @@ private:
 
     static constexpr std::string kAstBuilderFilename = "ast_builder.h";
     static constexpr std::string kAstBuilderClassName = "AstBuilder";
+    static constexpr std::string kAstNode = "ast::Node";
     static constexpr std::string kAstNodePtr = "ast::NodePtr";
     static constexpr std::string kTokenStruct = "Token";
 
@@ -41,6 +42,7 @@ public:
     CppGenerator(const grammar::GrammarInfo& grammar_info, const generators::LrTables& tables);
 
     void Create(const std::string& path);
+    void Update(const std::string& path);
 
 private:
     void GenerateLibFiles();
@@ -57,6 +59,7 @@ private:
     void GenerateGotoTable(std::ostream& out);
     void GenerateEnumFile(const std::string& path, const std::string& enum_name,
                           const std::set<std::string>& values);
+    void GenerateAstNodesFile();
 
 private:
     void WriteContent(const std::string& filename, const std::string& content);

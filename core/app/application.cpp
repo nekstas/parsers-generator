@@ -4,10 +4,10 @@
 
 int32_t Application::Run(size_t argc, char** argv) {
     try {
-        if (argc != kArgsCount) {
+        if (argc != kRequiredArgsCount) {
             PrintHelpMessage();
         } else {
-            GenerateParser(argv[1], argv[2]);
+            GenerateParser(argv[1], argv[2], argv[3]);
         }
     } catch (std::runtime_error error) {
         // TODO: handle an error
@@ -27,7 +27,8 @@ grammar::Symbol MakeNT(const std::string& name) {
     return {grammar::Symbol::Type::NonTerminal, name};
 }
 
-void Application::GenerateParser(const std::string& grammar_file, const std::string& output_path) {
+void Application::GenerateParser(const std::string& action, const std::string& grammar_file,
+                                 const std::string& output_path) {
     grammar::Grammar grammar;
 
     grammar.SetReturnType("Symbol", "Symbol");
@@ -99,7 +100,12 @@ void Application::GenerateParser(const std::string& grammar_file, const std::str
 
     generators::LrTables tables = generator.GenerateTables();
     code::CppGenerator code_gen(grammar_info, tables);
-    code_gen.Create(output_path);
+
+    if (action == "create") {
+        code_gen.Create(output_path);
+    } else {
+        code_gen.Update(output_path);
+    }
 }
 
 void Application::PrintHelpMessage() {

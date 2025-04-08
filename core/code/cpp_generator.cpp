@@ -2,9 +2,6 @@
 
 #include <fstream>
 
-// TODO: Move lib files
-// TODO: Think about usr/lexer and usr/ast_nodes templates
-
 namespace {
 
 constexpr const char* kLibTokenHContent =
@@ -484,6 +481,47 @@ constexpr const char* kLibErrorPrinterCppContent =
     "    SourceCodeError(error.message, error.line_content, error.line, error.pos, error.len);\n"
     "}";
 
+constexpr const char* kUsrLexerHContent =
+    "#pragma once\n"
+    "\n"
+    "#include <cstdint>\n"
+    "#include <string>\n"
+    "\n"
+    "#include \"../data/token_type.h\"\n"
+    "\n"
+    "namespace pg {\n"
+    "\n"
+    "class Lexer {\n"
+    "public:\n"
+    "    TokenType GetTokenType(const char*& current, const char* end);\n"
+    "};\n"
+    "\n"
+    "}  // namespace pg";
+
+constexpr const char* kUsrLexerReContent =
+    "#include \"lexer.h\"\n"
+    "\n"
+    "pg::TokenType pg::Lexer::GetTokenType(const char*& str_ptr, const char* end) {\n"
+    "    const char* marker = nullptr;\n"
+    "\n"
+    "    // NOLINTBEGIN\n"
+    "    /*!re2c\n"
+    "        re2c:define:YYCTYPE = \"unsigned char\";\n"
+    "        re2c:define:YYCURSOR = \"str_ptr\";\n"
+    "        re2c:define:YYLIMIT = \"end\";\n"
+    "        re2c:define:YYMARKER = \"marker\";\n"
+    "        re2c:yyfill:enable = 0;\n"
+    "\n"
+    "        * { return TokenType::Unknown; }\n"
+    "\n"
+    "        // Your rules here...\n"
+    "\n"
+    "    */\n"
+    "    // NOLINTEND\n"
+    "\n"
+    "    return TokenType::Unknown;\n"
+    "}";
+
 }  // namespace
 
 code::CppGenerator::CppGenerator(const grammar::GrammarInfo& grammar_info,
@@ -496,6 +534,10 @@ void code::CppGenerator::Create(const std::string& path) {
     GenerateLibFiles();
     GenerateDataFiles();
     GenerateUsrFiles();
+}
+
+void code::CppGenerator::Update(const std::string& path) {
+    GenerateDataFiles();
 }
 
 void code::CppGenerator::GenerateLibFiles() {
@@ -524,6 +566,14 @@ void code::CppGenerator::GenerateDataFiles() {
 
 void code::CppGenerator::GenerateUsrFiles() {
     auto dir = WithDir("usr");
+    WriteContent("lexer.h", kUsrLexerHContent);
+    WriteContent("lexer.re", kUsrLexerReContent);
+    GenerateAstNodesFile();
+}
+
+void code::CppGenerator::WriteContent(const std::string& filename, const std::string& content) {
+    auto out = OpenFile(filename);
+    out << content;
 }
 
 void code::CppGenerator::GenerateIdentifierFile() {
@@ -779,7 +829,15 @@ void code::CppGenerator::WriteMethodReturnTypePtr(std::ostream& out, const std::
     out << ">";
 }
 
-void code::CppGenerator::WriteContent(const std::string& filename, const std::string& content) {
-    auto out = OpenFile(filename);
-    out << content;
+void code::CppGenerator::GenerateAstNodesFile() {
+    auto out = OpenFile("ast_nodes.h");
+    out << "#pragma once\n\n";
+    out << "#include \"../lib/ast_node.h\"\n\n";
+    out << "namespace " << kAstNamespace << " {\n\n";
+
+    for (const std::string& return_type : grammar_info_.GetUsedReturnTypes()) {
+        out << "class " << return_type << " : public " << kAstNode << " {};\n";
+    }
+
+    out << "}\n";
 }
