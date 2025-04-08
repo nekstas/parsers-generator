@@ -102,7 +102,7 @@ void Application::GenerateParser(const std::string& grammar_file, const std::str
 
     generators::LrTables tables = generator.GenerateTables();
     code::CppGenerator code_gen(grammar_info, tables);
-    code_gen.Generate(output_path);
+    code_gen.Create(output_path);
 }
 
 void Application::PrintHelpMessage() {

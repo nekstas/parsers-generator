@@ -2,8 +2,6 @@
 
 #include <fstream>
 
-// TODO: Handle errors with files
-// TODO: Create folders if necessary
 // TODO: Move lib files
 // TODO: Think about usr/lexer and usr/ast_nodes templates
 
@@ -12,31 +10,46 @@ code::CppGenerator::CppGenerator(const grammar::GrammarInfo& grammar_info,
     : grammar_info_(grammar_info), tables_(tables) {
 }
 
-void code::CppGenerator::Generate(const std::string& path) {
-    std::string data_path = path + kDataPath;
-    GenerateIdentifierFile(data_path);
-    GenerateTokenTypeFile(data_path);
-    GenerateGrammarFile(data_path);
-    GenerateTablesFile(data_path);
-    GenerateAstBuilderFile(data_path);
+void code::CppGenerator::Create(const std::string& path) {
+    SetPath(path);
+    GenerateLibFiles();
+    GenerateDataFiles();
+    GenerateUsrFiles();
 }
 
-void code::CppGenerator::GenerateIdentifierFile(const std::string& path) {
+void code::CppGenerator::GenerateLibFiles() {
+    auto dir = WithDir("lib");
+}
+
+void code::CppGenerator::GenerateDataFiles() {
+    auto dir = WithDir("data");
+    GenerateIdentifierFile();
+    GenerateTokenTypeFile();
+    GenerateGrammarFile();
+    GenerateTablesFile();
+    GenerateAstBuilderFile();
+}
+
+void code::CppGenerator::GenerateUsrFiles() {
+    auto dir = WithDir("usr");
+}
+
+void code::CppGenerator::GenerateIdentifierFile() {
     const std::string& main_rule = grammar_info_.GetGrammar().GetMainRule();
     auto values = grammar_info_.GetUsedRules();
     values.erase(main_rule);
-    GenerateEnumFile(path + "/" + kIdentifierFilename, kIdentifierEnumName, values);
+    GenerateEnumFile(kIdentifierFilename, kIdentifierEnumName, values);
 }
 
-void code::CppGenerator::GenerateTokenTypeFile(const std::string& path) {
+void code::CppGenerator::GenerateTokenTypeFile() {
     auto values = grammar_info_.GetUsedTokens();
     values.insert(kSkipTokenName);
     values.insert(kUnknownTokenName);
-    GenerateEnumFile(path + "/" + kTokenTypeFilename, kTokenTypeEnumName, values);
+    GenerateEnumFile(kTokenTypeFilename, kTokenTypeEnumName, values);
 }
 
-void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
-    std::ofstream out(path + "/" + kGrammarFilename);
+void code::CppGenerator::GenerateGrammarFile() {
+    auto out = OpenFile(kGrammarFilename);
     out << "#pragma once\n";
     out << "#include \"../lib/grammar.h\"\n";
     out << "#include \"" << kIdentifierFilename << "\"\n";
@@ -92,8 +105,8 @@ void code::CppGenerator::GenerateGrammarFile(const std::string& path) {
     out << "}\n";
 }
 
-void code::CppGenerator::GenerateTablesFile(const std::string& path) {
-    std::ofstream out(path + "/" + kTablesFilename);
+void code::CppGenerator::GenerateTablesFile() {
+    auto out = OpenFile(kTablesFilename);
     out << "#pragma once\n";
     out << "#include \"../lib/lr_data.h\"\n";
     out << "#include \"" << kIdentifierFilename << "\"\n\n";
@@ -180,8 +193,8 @@ void code::CppGenerator::WriteSizeTNumber(std::ostream& out, size_t number) {
     }
 }
 
-void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
-    std::ofstream out(path + "/" + kAstBuilderFilename);
+void code::CppGenerator::GenerateAstBuilderFile() {
+    auto out = OpenFile(kAstBuilderFilename);
     out << "#pragma once\n";
     out << "#include <vector>\n";
     out << "#include \"../lib/ast_node.h\"\n";
@@ -244,9 +257,9 @@ void code::CppGenerator::GenerateAstBuilderFile(const std::string& path) {
     out << "}";
 }
 
-void code::CppGenerator::GenerateEnumFile(const std::string& path, const std::string& enum_name,
+void code::CppGenerator::GenerateEnumFile(const std::string& filename, const std::string& enum_name,
                                           const std::set<std::string>& values) {
-    std::ofstream out(path);
+    auto out = OpenFile(filename);
     out << "#pragma once\n";
     out << "#include <cstdint>\n\n";
     out << "namespace " << kMainNamespace << " {\n";

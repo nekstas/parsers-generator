@@ -1,14 +1,15 @@
 #pragma once
 
 #include "../generators/slr_generator.h"
+#include "code_generator.h"
+#include "filesystem_helper.h"
 
 namespace code {
 
-class CppGenerator {
+class CppGenerator : public CodeGenerator, public fs::FilesystemHelper {
 private:
     static constexpr std::string kMainNamespace = "pg";
     static constexpr std::string kAstNamespace = "ast";
-    static constexpr std::string kDataPath = "/data";
 
     static constexpr std::string kIdentifierFilename = "identifier.h";
     static constexpr std::string kIdentifierEnumName = "Identifier";
@@ -39,14 +40,19 @@ private:
 public:
     CppGenerator(const grammar::GrammarInfo& grammar_info, const generators::LrTables& tables);
 
-    void Generate(const std::string& path);
+    void Create(const std::string& path);
 
 private:
-    void GenerateIdentifierFile(const std::string& path);
-    void GenerateTokenTypeFile(const std::string& path);
-    void GenerateGrammarFile(const std::string& path);
-    void GenerateTablesFile(const std::string& path);
-    void GenerateAstBuilderFile(const std::string& path);
+    void GenerateLibFiles();
+    void GenerateDataFiles();
+    void GenerateUsrFiles();
+
+private:
+    void GenerateIdentifierFile();
+    void GenerateTokenTypeFile();
+    void GenerateGrammarFile();
+    void GenerateTablesFile();
+    void GenerateAstBuilderFile();
     void GenerateActionTable(std::ostream& out);
     void GenerateGotoTable(std::ostream& out);
     void GenerateEnumFile(const std::string& path, const std::string& enum_name,

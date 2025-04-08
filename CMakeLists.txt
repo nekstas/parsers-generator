@@ -21,4 +21,8 @@ add_executable(parsers_generator main.cpp
         core/code/cpp_generator.h
         core/app/application.h
         core/app/application.cpp
+        core/code/code_generator.h
+        core/code/filesystem_helper.cpp
+        core/code/filesystem_helper.h
+        core/app/errors.h
 )
