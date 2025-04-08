@@ -16,10 +16,10 @@ using Symbol = std::variant<TokenType, Identifier>;
 class AstBuilder;
 
 struct Rule {
-    using HandlerArg = std::variant<Token, ast::AstNodePtr>;
+    using HandlerArg = std::variant<Token, ast::NodePtr>;
     using HandlerArgs = std::vector<HandlerArg>;
     using HandlerType =
-        std::function<ast::AstNodePtr(AstBuilder& ast_builder, const HandlerArgs& args)>;
+        std::function<ast::NodePtr(AstBuilder& ast_builder, const HandlerArgs& args)>;
 
     Identifier result;
     std::vector<Symbol> sequence;

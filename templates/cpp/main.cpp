@@ -4,8 +4,8 @@
 #include "lib/tokenizer.h"
 #include "usr/calculator.h"
 
-int main() {
-    std::string code = "1 + 2 * 3 + 10 * 10 \n\n           23445568";
+void UnsafeMain() {
+    std::string code = "1 + 2 * 3 + 10 * 10";
     pg::Tokenizer::Result result = pg::Tokenizer().Tokenize(code);
 
     std::cerr << "Tokens:\n";
@@ -28,6 +28,15 @@ int main() {
     pg::LrParser parser = pg::LrParser::Create();
     Calculator calculator;
     parser.Parse(result, calculator);
+}
 
-    return 0;
+int main() {
+    try {
+        UnsafeMain();
+        return 0;
+    } catch (pg::TokenizerError error) {
+        pg::ErrorPrinter::Print(error);
+    } catch (pg::ParserError error) {
+        pg::ErrorPrinter::Print(error);
+    }
 }

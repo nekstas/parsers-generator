@@ -34,7 +34,7 @@ private:
 
     static constexpr std::string kAstBuilderFilename = "ast_builder.h";
     static constexpr std::string kAstBuilderClassName = "AstBuilder";
-    static constexpr std::string kAstNodePtr = "ast::AstNodePtr";
+    static constexpr std::string kAstNodePtr = "ast::NodePtr";
     static constexpr std::string kTokenStruct = "Token";
 
 public:
@@ -59,6 +59,7 @@ private:
                           const std::set<std::string>& values);
 
 private:
+    void WriteContent(const std::string& filename, const std::string& content);
     void WriteIdentifier(std::ostream& out, const std::string& name);
     void WriteToken(std::ostream& out, const std::string& name);
     void WriteSymbol(std::ostream& out, const grammar::Symbol& symbol);
@@ -70,6 +71,7 @@ private:
 
 private:
     grammar::GrammarInfo grammar_info_;
+    const grammar::Grammar& grammar_;
     generators::LrTables tables_;
 };
 

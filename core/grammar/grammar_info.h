@@ -17,6 +17,7 @@ public:
 
     const Grammar& GetGrammar() const;
     size_t GetMainRule() const;
+    const std::string GetOldMainRuleName() const;
     const std::set<std::string>& GetUsedTokens() const;
     const std::set<std::string>& GetUsedRules() const;
     const std::set<Symbol>& GetUsedSymbols() const;
@@ -40,6 +41,7 @@ private:
 
 private:
     Grammar grammar_;
+    std::string old_main_rule_name_;
 
     std::set<std::string> used_tokens_;
     std::set<std::string> used_rules_;

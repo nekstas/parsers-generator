@@ -5,9 +5,25 @@
 // TODO: Move lib files
 // TODO: Think about usr/lexer and usr/ast_nodes templates
 
+namespace {
+
+constexpr const char* kLibTokenHContent = "";
+constexpr const char* kLibLrDataHContent = "";
+constexpr const char* kLibGrammarHContent = "";
+constexpr const char* kLibAstNodeHContent = "";
+constexpr const char* kLibErrorsHContent = "";
+constexpr const char* kLibTokenizerHContent = "";
+constexpr const char* kLibTokenizerCppContent = "";
+constexpr const char* kLibParserHContent = "";
+constexpr const char* kLibParserCppContent = "";
+constexpr const char* kLibErrorPrinterHContent = "";
+constexpr const char* kLibErrorPrinterCppContent = "";
+
+}  // namespace
+
 code::CppGenerator::CppGenerator(const grammar::GrammarInfo& grammar_info,
                                  const generators::LrTables& tables)
-    : grammar_info_(grammar_info), tables_(tables) {
+    : grammar_info_(grammar_info), grammar_(grammar_info.GetGrammar()), tables_(tables) {
 }
 
 void code::CppGenerator::Create(const std::string& path) {
@@ -19,6 +35,17 @@ void code::CppGenerator::Create(const std::string& path) {
 
 void code::CppGenerator::GenerateLibFiles() {
     auto dir = WithDir("lib");
+    WriteContent("token.h", kLibTokenHContent);
+    WriteContent("lr_data.h", kLibLrDataHContent);
+    WriteContent("grammar.h", kLibGrammarHContent);
+    WriteContent("ast_node.h", kLibAstNodeHContent);
+    WriteContent("errors.h", kLibErrorsHContent);
+    WriteContent("tokenizer.h", kLibTokenizerHContent);
+    WriteContent("tokenizer.cpp", kLibTokenizerCppContent);
+    WriteContent("parser.h", kLibParserHContent);
+    WriteContent("parser.cpp", kLibParserCppContent);
+    WriteContent("error_printer.h", kLibErrorPrinterHContent);
+    WriteContent("error_printer.cpp", kLibErrorPrinterCppContent);
 }
 
 void code::CppGenerator::GenerateDataFiles() {
@@ -56,8 +83,7 @@ void code::CppGenerator::GenerateGrammarFile() {
     out << "#include \"" << kAstBuilderFilename << "\"\n\n";
     out << "namespace " << kMainNamespace << " {\n";
     out << "const " << kGrammarStructName << " " << kGrammarName << " = {{\n";
-    const auto& grammar = grammar_info_.GetGrammar();
-    const auto& rules = grammar.GetRules();
+    const auto& rules = grammar_.GetRules();
     for (const auto& rule : rules) {
         if (rule.name == grammar::GrammarInfo::kNewMainRuleName) {
             continue;
@@ -101,7 +127,12 @@ void code::CppGenerator::GenerateGrammarFile() {
         out << "}";
         out << "},\n";
     }
-    out << "}};\n";
+    out << "}};\n\n";
+
+    out << "const auto kToMainRule = [](ast::NodePtr node) { return ast::As<";
+    WriteMethodReturnType(out, grammar_info_.GetOldMainRuleName());
+    out << ">(node); };\n\n";
+
     out << "}\n";
 }
 
@@ -202,7 +233,7 @@ void code::CppGenerator::GenerateAstBuilderFile() {
     out << "#include \"../lib/token.h\"\n";
     out << "#include \"../lib/tokenizer.h\"\n";
     out << "#include \"../lib/error_printer.h\"\n\n";
-    out << "#include \"../usr/ast_nodes.h\"\n";
+    out << "#include \"../usr/ast_nodes.h\"\n\n";
 
     out << "namespace " << kAstNamespace << " {\n";
     for (const std::string& return_type : grammar_info_.GetUsedReturnTypes()) {
@@ -215,19 +246,17 @@ void code::CppGenerator::GenerateAstBuilderFile() {
     out << "public:\n";
     out << "    virtual ~" << kAstBuilderClassName << "() {}\n\n";
     out << "    virtual void Setup() {};\n";
-    out << "    virtual void Accept(" << kAstNodePtr << " root) = 0;\n";
-    out << "    virtual void Error(const Tokenizer::Result& input, size_t error_index) {\n";
-    out << "        ErrorPrinter::UnexpectedToken(input, error_index);\n";
-    out << "    }\n\n";
+    out << "    virtual void Accept(";
+    WriteMethodReturnTypePtr(out, grammar_info_.GetOldMainRuleName());
+    out << " root) = 0;\n\n";
 
-    const auto& grammar = grammar_info_.GetGrammar();
-    const auto& rules_map = grammar.GetRulesMap();
+    const auto& rules_map = grammar_.GetRulesMap();
     for (const auto& [identifier, rules] : rules_map) {
-        if (identifier == grammar.GetMainRule()) {
+        if (identifier == grammar_.GetMainRule()) {
             continue;
         }
         for (size_t rule_index : rules) {
-            const auto& rule = grammar.GetRule(rule_index);
+            const auto& rule = grammar_.GetRule(rule_index);
             out << "    virtual ";
             WriteMethodReturnTypePtr(out, rule.name);
             out << " ";
@@ -283,4 +312,9 @@ void code::CppGenerator::WriteMethodReturnTypePtr(std::ostream& out, const std::
     out << "std::shared_ptr<";
     WriteMethodReturnType(out, name);
     out << ">";
+}
+
+void code::CppGenerator::WriteContent(const std::string& filename, const std::string& content) {
+    auto out = OpenFile(filename);
+    out << content;
 }

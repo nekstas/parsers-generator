@@ -2,7 +2,8 @@
 
 #include "../../utils/input_output.hpp"
 
-grammar::GrammarInfo::GrammarInfo(const grammar::Grammar& grammar) : grammar_(grammar) {
+grammar::GrammarInfo::GrammarInfo(const grammar::Grammar& grammar)
+    : grammar_(grammar), old_main_rule_name_(grammar.GetMainRule()) {
     Build();
 }
 
@@ -175,6 +176,11 @@ void grammar::GrammarInfo::AddUsedReturnTypeFor(const std::string& name) {
 
 const std::set<std::string>& grammar::GrammarInfo::GetUsedReturnTypes() const {
     return used_return_types_;
+}
+
+const std::string grammar::GrammarInfo::GetOldMainRuleName() const {
+    size_t new_main_rule_index = grammar_.GetRulesFor(grammar_.GetMainRule()).at(0);
+    return grammar_.GetRule(new_main_rule_index).sequence.at(0).value;
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::GrammarInfo& info) {

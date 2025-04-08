@@ -37,7 +37,7 @@ void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast
             result_stack.push_back(rule.handler(ast_builder, args));
         } else {
             if (action.type == LrAction::Type::ACCEPT) {
-                ast_builder.Accept(std::get<ast::AstNodePtr>(result_stack.back()));
+                ast_builder.Accept(kToMainRule(std::get<ast::NodePtr>(result_stack.back())));
                 break;
             }
             throw pg::ParserError("unexpected token", input, i);
