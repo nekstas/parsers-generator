@@ -16,10 +16,15 @@ private:
         const char* current = nullptr;
         const char* end = nullptr;
         const char* line_begin = nullptr;
+        size_t line_number = 0;
 
         Context() = default;
         explicit Context(const std::string& code)
-            : prev(code.c_str()), current(prev), end(prev + code.size()), line_begin(prev) {
+            : prev(code.c_str()),
+              current(prev),
+              end(prev + code.size()),
+              line_begin(prev),
+              line_number(0) {
         }
     };
 
@@ -32,13 +37,13 @@ public:
 public:
     Result Tokenize(const std::string& code);
 
+private:
     void Init(const std::string& code);
+    void SplitIntoLines();
     bool IsEnd();
     void ProcessNewToken();
     void ProcessNewLines();
     void AddEofToken();
-    void ProcessEnd();
-    void AddLineToResult();
     size_t GetCurrentLine();
     size_t GetCurrentPos();
 

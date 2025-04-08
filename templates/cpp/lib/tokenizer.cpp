@@ -1,14 +1,17 @@
 #include "tokenizer.h"
 
+#include "errors.h"
+
 pg::Tokenizer::Result pg::Tokenizer::Tokenize(const std::string& code) {
     Init(code);
+    SplitIntoLines();
 
     while (!IsEnd()) {
         ProcessNewToken();
         ProcessNewLines();
     }
 
-    ProcessEnd();
+    AddEofToken();
     return result_;
 }
 
@@ -18,6 +21,17 @@ void pg::Tokenizer::Init(const std::string& code) {
     result_ = Result{};
 }
 
+void pg::Tokenizer::SplitIntoLines() {
+    const char* prev = context_.current;
+    for (const char* current = context_.current; current != context_.end; ++current) {
+        if (*current == '\n') {
+            result_.lines.emplace_back(prev, current);
+            prev = current + 1;
+        }
+    }
+    result_.lines.emplace_back(prev, context_.end);
+}
+
 bool pg::Tokenizer::IsEnd() {
     return context_.current == context_.end;
 }
@@ -25,11 +39,9 @@ bool pg::Tokenizer::IsEnd() {
 void pg::Tokenizer::ProcessNewToken() {
     pg::TokenType type = lexer_.GetTokenType(context_.current, context_.end);
     if (type == pg::TokenType::Unknown) {
-        // TODO: throw an error
-        throw std::runtime_error{"Unknown Token."};
+        throw pg::TokenizerError("unknown token", result_.lines, GetCurrentLine(), GetCurrentPos());
     } else if (type == pg::TokenType::Eof) {
-        // TODO: think, what we should do here
-        throw std::runtime_error{"Unexpected Eof."};
+        throw std::logic_error{"Lexer should not return Eof token."};
     } else if (type != pg::TokenType::Skip) {
         result_.tokens.emplace_back(type, std::string(context_.prev, context_.current),
                                     GetCurrentLine(), GetCurrentPos());
@@ -39,7 +51,8 @@ void pg::Tokenizer::ProcessNewToken() {
 void pg::Tokenizer::ProcessNewLines() {
     for (; context_.prev != context_.current; ++context_.prev) {
         if (*context_.prev == '\n') {
-            AddLineToResult();
+            context_.line_begin = context_.prev + 1;
+            ++context_.line_number;
         }
     }
 }
@@ -48,18 +61,8 @@ void pg::Tokenizer::AddEofToken() {
     result_.tokens.emplace_back(pg::TokenType::Eof, "", GetCurrentLine(), GetCurrentPos());
 }
 
-void pg::Tokenizer::ProcessEnd() {
-    AddEofToken();
-    AddLineToResult();
-}
-
-void pg::Tokenizer::AddLineToResult() {
-    result_.lines.emplace_back(context_.line_begin, context_.prev);
-    context_.line_begin = context_.prev + 1;
-}
-
 size_t pg::Tokenizer::GetCurrentLine() {
-    return result_.lines.size();
+    return context_.line_number;
 }
 
 size_t pg::Tokenizer::GetCurrentPos() {

@@ -2,11 +2,18 @@
 
 #include <iostream>
 
-void pg::ErrorPrinter::UnexpectedToken(const pg::Tokenizer::Result& input, size_t error_index) {
-    const Token& token = input.tokens[error_index];
-    std::cerr << "An error has occurred: unexpected token ";
-    std::cerr << "on line " << (token.line + 1) << ", character " << (token.pos + 1) << "\n";
-    std::cerr << "| " << input.lines[token.line] << "\n";
-    std::cerr << "| " << std::string(token.pos, ' ') << std::string(token.value.size(), '^')
-              << "\n";
+void pg::ErrorPrinter::SourceCodeError(const std::string& message, const std::string& line_content,
+                                       size_t line, size_t pos, size_t len) {
+    std::cerr << "An error has occurred: " << message;
+    std::cerr << " on line " << (line + 1) << ", character " << (pos + 1) << "\n";
+    std::cerr << "| " << line_content << "\n";
+    std::cerr << "| " << std::string(pos, ' ') << std::string(len, '^') << "\n";
+}
+
+void pg::ErrorPrinter::Print(const pg::TokenizerError& error) {
+    SourceCodeError(error.message, error.line_content, error.line, error.pos, 1);
+}
+
+void pg::ErrorPrinter::Print(const pg::ParserError& error) {
+    SourceCodeError(error.message, error.line_content, error.line, error.pos, error.len);
 }

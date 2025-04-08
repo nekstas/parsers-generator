@@ -2,6 +2,7 @@
 
 #include "../data/grammar.h"
 #include "../data/tables.h"
+#include "errors.h"
 
 pg::LrParser::LrParser(const pg::LrData& data) : data_(data) {
 }
@@ -37,10 +38,9 @@ void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast
         } else {
             if (action.type == LrAction::Type::ACCEPT) {
                 ast_builder.Accept(std::get<ast::AstNodePtr>(result_stack.back()));
-            } else {
-                ast_builder.Error(input, i);
+                break;
             }
-            break;
+            throw pg::ParserError("unexpected token", input, i);
         }
     }
 }

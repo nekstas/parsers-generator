@@ -1,9 +1,6 @@
 #include "application.h"
 
 #include "../code/cpp_generator.h"
-#include "../generators/slr_generator.h"
-#include "../grammar/grammar.h"
-#include "../grammar/grammar_info.h"
 
 int32_t Application::Run(size_t argc, char** argv) {
     try {
