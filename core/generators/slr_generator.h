@@ -38,10 +38,30 @@ struct LrAction {
     enum class Type { SHIFT, REDUCE, ACCEPT, ERROR };
     Type type;
     size_t index;
+
+    bool operator==(const LrAction& other) const {
+        return std::tie(type, index) == std::tie(other.type, other.index);
+    }
+
+    std::string TypeToString() const {
+        switch (type) {
+            case Type::SHIFT:
+                return "SHIFT";
+            case Type::REDUCE:
+                return "REDUCE";
+            case Type::ACCEPT:
+                return "ACCEPT";
+            case Type::ERROR:
+                return "ERROR";
+        }
+        return "UNKNOWN";
+    }
 };
 
 using LrActionTable = std::vector<std::map<std::string, LrAction>>;
 using LrGotoTable = std::vector<std::map<std::string, size_t>>;
+
+class SlrGenerator;
 
 struct LrTables {
     LrActionTable action_table;
@@ -49,14 +69,17 @@ struct LrTables {
 
     LrTables(size_t size);
 
-    void AddAction(size_t state, const std::string& token, const LrAction& action);
-    void AddShiftAction(size_t state, const std::string& token, size_t new_state);
-    void AddReduceAction(size_t state, const std::string& token, size_t rule);
-    void AddAcceptAction(size_t state, const std::string& token);
-    void AddErrorAction(size_t state, const std::string& token);
+    void AddAction(size_t state, const std::string& token, const LrAction& action,
+                   const SlrGenerator& generator);
+    void AddShiftAction(size_t state, const std::string& token, size_t new_state,
+                        const SlrGenerator& generator);
+    void AddReduceAction(size_t state, const std::string& token, size_t rule,
+                         const SlrGenerator& generator);
+    void AddAcceptAction(size_t state, const std::string& token, const SlrGenerator& generator);
+    void AddErrorAction(size_t state, const std::string& token, const SlrGenerator& generator);
 
     void AddGoto(size_t state, const std::string& symbol, size_t new_state);
-    void SetErrorIfNoAction(size_t state, const grammar::Symbol& symbol);
+    void SetErrorIfNoAction(size_t state, const grammar::Symbol& symbol, const SlrGenerator& generator);
 };
 
 class SlrGenerator {
@@ -64,6 +87,8 @@ public:
     SlrGenerator(const grammar::GrammarInfo& grammar_info);
 
     LrTables GenerateTables();
+
+    const SlrStates& GetStates() const;
 
     void Visualize(std::ostream& out, const Lr0Item& item) const;
     void Visualize(std::ostream& out, const SetOfLr0Items& items) const;

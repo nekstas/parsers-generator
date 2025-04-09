@@ -33,6 +33,7 @@ private:
     void AddUsedRule(const std::string& name);
     void AddUsedReturnTypeFor(const std::string& name);
     void AddUsedSymbol(const Symbol& symbol);
+    void AddUsedHandlerName(const std::string& handler_name);
     void BuildUsedSets();
     void CheckUsedRules();
     void BuildFirstValues();
@@ -47,6 +48,7 @@ private:
     std::set<std::string> used_rules_;
     std::set<Symbol> used_symbols_;
     std::set<std::string> used_return_types_;
+    std::set<std::string> used_handler_names_;
 
     std::map<Symbol, std::set<std::string>> first_;
     std::map<std::string, std::set<std::string>> follow_;

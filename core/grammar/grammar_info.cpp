@@ -51,6 +51,7 @@ void grammar::GrammarInfo::BuildUsedSets() {
         for (const grammar::Symbol& symbol : rule.sequence) {
             AddUsedSymbol(symbol);
         }
+        AddUsedHandlerName(rule.handler_name);
     }
 
     AddUsedToken(kEofTokenName);
@@ -183,6 +184,15 @@ const std::set<std::string>& grammar::GrammarInfo::GetUsedReturnTypes() const {
 const std::string grammar::GrammarInfo::GetOldMainRuleName() const {
     size_t new_main_rule_index = grammar_.GetRulesFor(grammar_.GetMainRule()).at(0);
     return grammar_.GetRule(new_main_rule_index).sequence.at(0).value;
+}
+
+void grammar::GrammarInfo::AddUsedHandlerName(const std::string& handler_name) {
+    if (used_handler_names_.contains(handler_name)) {
+        throw errors::ApplicationError{FormatStream() << "The same handler name \"" << handler_name
+                                                      << "\" for different productions."};
+    }
+
+    used_handler_names_.insert(handler_name);
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::GrammarInfo& info) {
