@@ -90,8 +90,7 @@ constexpr const char* kLibGrammarHContent =
     "};\n"
     "\n"
     "}  // namespace pg";
-constexpr const char* kLibAstNodeHContent =
-    "#pragma once\n"
+constexpr const char* kLibAstNodeHContent = "#pragma once\n"
     "\n"
     "#include <memory>\n"
     "#include <stdexcept>\n"
@@ -109,6 +108,11 @@ constexpr const char* kLibAstNodeHContent =
     "template <typename T, typename... Args>\n"
     "std::shared_ptr<T> Make(Args&&... args) {\n"
     "    return std::make_shared<T>(std::forward<Args>(args)...);\n"
+    "}\n"
+    "\n"
+    "template <typename T>\n"
+    "bool Is(NodePtr node) {\n"
+    "    return static_cast<bool>(std::dynamic_pointer_cast<T>(node));\n"
     "}\n"
     "\n"
     "template <typename T>\n"

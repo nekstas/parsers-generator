@@ -19,6 +19,11 @@ std::shared_ptr<T> Make(Args&&... args) {
 }
 
 template <typename T>
+bool Is(NodePtr node) {
+    return static_cast<bool>(std::dynamic_pointer_cast<T>(node));
+}
+
+template <typename T>
 std::shared_ptr<T> As(NodePtr node) {
     std::shared_ptr<T> result = std::dynamic_pointer_cast<T>(node);
     if (!result) {
