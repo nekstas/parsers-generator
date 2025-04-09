@@ -57,8 +57,12 @@ std::ostream& operator<<(std::ostream& out, const grammar::Symbol& symbol) {
 
 std::ostream& operator<<(std::ostream& out, const grammar::Rule& rule) {
     out << "<" << rule.name << ">" << " ::=";
-    for (const grammar::Symbol& symbol : rule.sequence) {
-        out << " " << symbol;
+    for (size_t i = 0; i < rule.sequence.size(); ++i) {
+        out << " ";
+        if (rule.take.at(i)) {
+            out << "$";
+        }
+        out << rule.sequence.at(i);
     }
     return out;
 }
