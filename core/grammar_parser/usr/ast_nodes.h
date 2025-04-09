@@ -38,8 +38,8 @@ private:
 
 class SequenceOfSymbols : public ast::Node {
 public:
-    SequenceOfSymbols(std::shared_ptr<TakeSymbol> symbol)
-        : sequence_{symbol->GetSymbol()}, take_(symbol->GetTake()) {
+    SequenceOfSymbols(std::shared_ptr<TakeSymbol> symbol) {
+        AddSymbol(symbol);
     }
 
     void AddSymbol(std::shared_ptr<TakeSymbol> symbol) {
