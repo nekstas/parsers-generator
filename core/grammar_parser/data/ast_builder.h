@@ -9,7 +9,6 @@
 #include "../usr/ast_nodes.h"
 
 namespace ast {
-class Grammar;
 class Production;
 class ProductionList;
 class Rule;
@@ -26,9 +25,8 @@ public:
     virtual ~AstBuilder() {}
 
     virtual void Setup() {};
-    virtual void Accept(std::shared_ptr<ast::Grammar> root) = 0;
+    virtual void Accept(std::shared_ptr<ast::RuleList> root) = 0;
 
-    virtual std::shared_ptr<ast::Grammar> HandleGrammar(std::shared_ptr<ast::RuleList>) = 0;
     virtual std::shared_ptr<ast::Production> HandleProduction(std::shared_ptr<ast::SequenceOfSymbols>, const Token&) = 0;
     virtual std::shared_ptr<ast::ProductionList> HandleProductionListBegin(std::shared_ptr<ast::Production>) = 0;
     virtual std::shared_ptr<ast::ProductionList> HandleProductionListContinue(std::shared_ptr<ast::ProductionList>, std::shared_ptr<ast::Production>) = 0;

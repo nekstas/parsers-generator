@@ -20,9 +20,8 @@ const Grammar kGrammar = {{
 {Identifier::Rule, {TokenType::At, Identifier::RuleHeader, Identifier::ProductionList, },[](AstBuilder& ast_builder, const Rule::HandlerArgs& args){return ast_builder.HandleMainRule(ast::As<ast::RuleHeader>(std::get<ast::NodePtr>(args[1])), ast::As<ast::ProductionList>(std::get<ast::NodePtr>(args[2])));}},
 {Identifier::RuleList, {Identifier::Rule, },[](AstBuilder& ast_builder, const Rule::HandlerArgs& args){return ast_builder.HandleRuleListBegin(ast::As<ast::Rule>(std::get<ast::NodePtr>(args[0])));}},
 {Identifier::RuleList, {Identifier::RuleList, Identifier::Rule, },[](AstBuilder& ast_builder, const Rule::HandlerArgs& args){return ast_builder.HandleRuleListContinue(ast::As<ast::RuleList>(std::get<ast::NodePtr>(args[0])), ast::As<ast::Rule>(std::get<ast::NodePtr>(args[1])));}},
-{Identifier::Grammar, {Identifier::RuleList, },[](AstBuilder& ast_builder, const Rule::HandlerArgs& args){return ast_builder.HandleGrammar(ast::As<ast::RuleList>(std::get<ast::NodePtr>(args[0])));}},
 }};
 
-const auto kToMainRule = [](ast::NodePtr node) { return ast::As<ast::Grammar>(node); };
+const auto kToMainRule = [](ast::NodePtr node) { return ast::As<ast::RuleList>(node); };
 
 }
