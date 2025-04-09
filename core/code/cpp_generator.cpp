@@ -537,6 +537,7 @@ void code::CppGenerator::Create(const std::string& path) {
 }
 
 void code::CppGenerator::Update(const std::string& path) {
+    SetPath(path);
     GenerateDataFiles();
 }
 
