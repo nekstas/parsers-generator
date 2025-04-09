@@ -12,7 +12,7 @@ void fs::FilesystemHelper::MakeDir() {
     if (!std::filesystem::exists(current_path_)) {
         if (!std::filesystem::create_directory(current_path_)) {
             throw errors::FilesystemError{FormatStream() << "Can't create a directory \""
-                                                         << current_path_ << "\""};
+                                                         << current_path_ << "\"."};
         }
     }
 }
@@ -37,7 +37,7 @@ std::ofstream fs::FilesystemHelper::OpenFile(const std::string& filename) {
     std::ofstream out(file_path);
     if (!out.good() || !out) {
         throw errors::FilesystemError{FormatStream()
-                                      << "Can't create a file \"" << file_path << "\""};
+                                      << "Can't create a file \"" << file_path << "\"."};
     }
     return std::move(out);
 }
