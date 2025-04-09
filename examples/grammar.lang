@@ -1,0 +1,30 @@
+[Symbol]
+$Name -> Terminal
+OpenTr $Name CloseTr -> NonTerminal
+
+[TakeSymbol]
+$<Symbol> -> DontTakeSymbol
+Dollar $<Symbol> -> TakeSymbol
+
+[SequenceOfSymbols]
+$<TakeSymbol> -> SequenceOfSymbolsBegin
+$<SequenceOfSymbols> $<TakeSymbol> -> SequenceOfSymbolsContinue
+
+[Production]
+$<SequenceOfSymbols> ArrowRight $Name -> Production
+
+[ProductionList]
+$<Production> -> ProductionListBegin
+$<ProductionList> $<Production> -> ProductionListContinue
+
+[RuleHeader]
+OpenSq $Name CloseSq -> CommonRuleHeader
+OpenSq $Name Colon $Name CloseSq -> TypedRuleHeader
+
+[Rule]
+$<RuleHeader> $<ProductionList> -> CommonRule
+At $<RuleHeader> $<ProductionList> -> MainRule
+
+@[RuleList]
+$<Rule> -> RuleListBegin
+$<RuleList> $<Rule> -> RuleListContinue
