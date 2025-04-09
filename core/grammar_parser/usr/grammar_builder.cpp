@@ -61,15 +61,18 @@ std::shared_ptr<ast::RuleHeader> GrammarBuilder::HandleTypedRuleHeader(
 
 std::shared_ptr<ast::Rule> GrammarBuilder::HandleCommonRule(
     std::shared_ptr<ast::RuleHeader> header, std::shared_ptr<ast::ProductionList> productions) {
-    return ast::Make<ast::Rule>(*header, ProcessProductions(*header, productions->GetProductions()));
+    return ast::Make<ast::Rule>(*header,
+                                ProcessProductions(*header, productions->GetProductions()));
 }
 
 std::shared_ptr<ast::Rule> GrammarBuilder::HandleMainRule(
     std::shared_ptr<ast::RuleHeader> header, std::shared_ptr<ast::ProductionList> productions) {
-    return ast::Make<ast::MainRule>(*header, ProcessProductions(*header, productions->GetProductions()));
+    return ast::Make<ast::MainRule>(*header,
+                                    ProcessProductions(*header, productions->GetProductions()));
 }
 
-std::shared_ptr<ast::RuleList> GrammarBuilder::HandleRuleListBegin(std::shared_ptr<ast::Rule> rule) {
+std::shared_ptr<ast::RuleList> GrammarBuilder::HandleRuleListBegin(
+    std::shared_ptr<ast::Rule> rule) {
     return ast::Make<ast::RuleList>(rule);
 }
 

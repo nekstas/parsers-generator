@@ -79,7 +79,8 @@ struct LrTables {
     void AddErrorAction(size_t state, const std::string& token, const SlrGenerator& generator);
 
     void AddGoto(size_t state, const std::string& symbol, size_t new_state);
-    void SetErrorIfNoAction(size_t state, const grammar::Symbol& symbol, const SlrGenerator& generator);
+    void SetErrorIfNoAction(size_t state, const grammar::Symbol& symbol,
+                            const SlrGenerator& generator);
 };
 
 class SlrGenerator {

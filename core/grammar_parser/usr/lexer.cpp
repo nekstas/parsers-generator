@@ -5,199 +5,234 @@ pg::TokenType pg::Lexer::GetTokenType(const char*& str_ptr, const char* end) {
     const char* marker = nullptr;
 
     // NOLINTBEGIN
-    
-{
-	unsigned char yych;
-	yych = *str_ptr;
-	switch (yych) {
-		case '\t':
-		case '\n':
-		case '\r':
-		case ' ': goto yy3;
-		case '#': goto yy4;
-		case '$': goto yy5;
-		case '-': goto yy6;
-		case ':': goto yy7;
-		case '<': goto yy8;
-		case '>': goto yy9;
-		case '@': goto yy10;
-		case 'A':
-		case 'B':
-		case 'C':
-		case 'D':
-		case 'E':
-		case 'F':
-		case 'G':
-		case 'H':
-		case 'I':
-		case 'J':
-		case 'K':
-		case 'L':
-		case 'M':
-		case 'N':
-		case 'O':
-		case 'P':
-		case 'Q':
-		case 'R':
-		case 'S':
-		case 'T':
-		case 'U':
-		case 'V':
-		case 'W':
-		case 'X':
-		case 'Y':
-		case 'Z':
-		case 'a':
-		case 'b':
-		case 'c':
-		case 'd':
-		case 'e':
-		case 'f':
-		case 'g':
-		case 'h':
-		case 'i':
-		case 'j':
-		case 'k':
-		case 'l':
-		case 'm':
-		case 'n':
-		case 'o':
-		case 'p':
-		case 'q':
-		case 'r':
-		case 's':
-		case 't':
-		case 'u':
-		case 'v':
-		case 'w':
-		case 'x':
-		case 'y':
-		case 'z': goto yy11;
-		case '[': goto yy13;
-		case ']': goto yy14;
-		default: goto yy1;
-	}
-yy1:
-	++str_ptr;
-yy2:
-	{ return TokenType::Unknown; }
-yy3:
-	++str_ptr;
-	{ return TokenType::Skip; }
-yy4:
-	yych = *++str_ptr;
-	switch (yych) {
-		case '\n': goto yy2;
-		default: goto yy15;
-	}
-yy5:
-	++str_ptr;
-	{ return TokenType::Dollar; }
-yy6:
-	yych = *++str_ptr;
-	switch (yych) {
-		case '>': goto yy17;
-		default: goto yy2;
-	}
-yy7:
-	++str_ptr;
-	{ return TokenType::Colon; }
-yy8:
-	++str_ptr;
-	{ return TokenType::OpenTr; }
-yy9:
-	++str_ptr;
-	{ return TokenType::CloseTr; }
-yy10:
-	++str_ptr;
-	{ return TokenType::At; }
-yy11:
-	yych = *++str_ptr;
-	switch (yych) {
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-		case 'A':
-		case 'B':
-		case 'C':
-		case 'D':
-		case 'E':
-		case 'F':
-		case 'G':
-		case 'H':
-		case 'I':
-		case 'J':
-		case 'K':
-		case 'L':
-		case 'M':
-		case 'N':
-		case 'O':
-		case 'P':
-		case 'Q':
-		case 'R':
-		case 'S':
-		case 'T':
-		case 'U':
-		case 'V':
-		case 'W':
-		case 'X':
-		case 'Y':
-		case 'Z':
-		case 'a':
-		case 'b':
-		case 'c':
-		case 'd':
-		case 'e':
-		case 'f':
-		case 'g':
-		case 'h':
-		case 'i':
-		case 'j':
-		case 'k':
-		case 'l':
-		case 'm':
-		case 'n':
-		case 'o':
-		case 'p':
-		case 'q':
-		case 'r':
-		case 's':
-		case 't':
-		case 'u':
-		case 'v':
-		case 'w':
-		case 'x':
-		case 'y':
-		case 'z': goto yy11;
-		default: goto yy12;
-	}
-yy12:
-	{ return TokenType::Name; }
-yy13:
-	++str_ptr;
-	{ return TokenType::OpenSq; }
-yy14:
-	++str_ptr;
-	{ return TokenType::CloseSq; }
-yy15:
-	yych = *++str_ptr;
-	switch (yych) {
-		case '\n': goto yy16;
-		default: goto yy15;
-	}
-yy16:
-	{ return TokenType::Skip; }
-yy17:
-	++str_ptr;
-	{ return TokenType::ArrowRight; }
-}
+
+    {
+        unsigned char yych;
+        yych = *str_ptr;
+        switch (yych) {
+            case '\t':
+            case '\n':
+            case '\r':
+            case ' ':
+                goto yy3;
+            case '#':
+                goto yy4;
+            case '$':
+                goto yy5;
+            case '-':
+                goto yy6;
+            case ':':
+                goto yy7;
+            case '<':
+                goto yy8;
+            case '>':
+                goto yy9;
+            case '@':
+                goto yy10;
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'k':
+            case 'l':
+            case 'm':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 'r':
+            case 's':
+            case 't':
+            case 'u':
+            case 'v':
+            case 'w':
+            case 'x':
+            case 'y':
+            case 'z':
+                goto yy11;
+            case '[':
+                goto yy13;
+            case ']':
+                goto yy14;
+            default:
+                goto yy1;
+        }
+    yy1:
+        ++str_ptr;
+    yy2: { return TokenType::Unknown; }
+    yy3:
+        ++str_ptr;
+        {
+            return TokenType::Skip;
+        }
+    yy4:
+        yych = *++str_ptr;
+        switch (yych) {
+            case '\n':
+                goto yy2;
+            default:
+                goto yy15;
+        }
+    yy5:
+        ++str_ptr;
+        {
+            return TokenType::Dollar;
+        }
+    yy6:
+        yych = *++str_ptr;
+        switch (yych) {
+            case '>':
+                goto yy17;
+            default:
+                goto yy2;
+        }
+    yy7:
+        ++str_ptr;
+        {
+            return TokenType::Colon;
+        }
+    yy8:
+        ++str_ptr;
+        {
+            return TokenType::OpenTr;
+        }
+    yy9:
+        ++str_ptr;
+        {
+            return TokenType::CloseTr;
+        }
+    yy10:
+        ++str_ptr;
+        {
+            return TokenType::At;
+        }
+    yy11:
+        yych = *++str_ptr;
+        switch (yych) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'k':
+            case 'l':
+            case 'm':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 'r':
+            case 's':
+            case 't':
+            case 'u':
+            case 'v':
+            case 'w':
+            case 'x':
+            case 'y':
+            case 'z':
+                goto yy11;
+            default:
+                goto yy12;
+        }
+    yy12: { return TokenType::Name; }
+    yy13:
+        ++str_ptr;
+        {
+            return TokenType::OpenSq;
+        }
+    yy14:
+        ++str_ptr;
+        {
+            return TokenType::CloseSq;
+        }
+    yy15:
+        yych = *++str_ptr;
+        switch (yych) {
+            case '\n':
+                goto yy16;
+            default:
+                goto yy15;
+        }
+    yy16: { return TokenType::Skip; }
+    yy17:
+        ++str_ptr;
+        {
+            return TokenType::ArrowRight;
+        }
+    }
 
     // NOLINTEND
 
