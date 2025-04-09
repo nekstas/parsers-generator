@@ -1,5 +1,7 @@
 #include "grammar.h"
 
+#include "../../utils/format_stream.h"
+
 size_t grammar::Grammar::AddRule(const grammar::Rule& rule) {
     size_t index = GetRulesCount();
     rules_.push_back(rule);
@@ -37,15 +39,19 @@ const std::map<std::string, std::vector<size_t>>& grammar::Grammar::GetRulesMap(
 
 void grammar::Grammar::SetReturnType(const std::string& name, const std::string& return_type) {
     if (return_types_.contains(name) && return_types_.at(name) != return_type) {
-        // TODO: throw an error
-        throw std::runtime_error{
-            "Return type should be the same for every rule for the same identifier."};
+        throw std::logic_error{FormatStream()
+                               << "Different return types: \"" << return_types_.at(name)
+                               << "\" and \"" << return_type << "\"."};
     }
     return_types_[name] = return_type;
 }
 
 std::string grammar::Grammar::GetReturnType(const std::string& name) const {
     return return_types_.at(name);
+}
+
+bool grammar::Grammar::HasRule(const std::string& name) {
+    return rules_for_name_.contains(name);
 }
 
 std::ostream& operator<<(std::ostream& out, const grammar::Symbol& symbol) {

@@ -1,6 +1,8 @@
 #include "grammar_info.h"
 
+#include "../../utils/format_stream.h"
 #include "../../utils/input_output.hpp"
+#include "../app/errors.h"
 
 grammar::GrammarInfo::GrammarInfo(const grammar::Grammar& grammar)
     : grammar_(grammar), old_main_rule_name_(grammar.GetMainRule()) {
@@ -34,8 +36,8 @@ const std::set<std::string>& grammar::GrammarInfo::GetUsedRules() const {
 void grammar::GrammarInfo::UpdateMainRule() {
     auto old_main_rule = grammar_.GetMainRule();
     if (old_main_rule.empty()) {
-        // TODO: throw an error, that main rule is not selected
-        throw std::runtime_error{"No main rule."};
+        throw errors::ApplicationError{
+            "There are no main rule in grammar. Use special syntax to mark main rule."};
     }
 
     grammar::Symbol symbol = {grammar::Symbol::Type::NonTerminal, old_main_rule};
@@ -82,15 +84,15 @@ void grammar::GrammarInfo::CheckUsedRules() {
 
     for (const auto& [name, rules] : rules_map) {
         if (!used_rules_.contains(name)) {
-            // TODO: throw an error.
-            throw std::runtime_error{"Rule is useless."};
+            throw errors::ApplicationError{FormatStream() << "Rule with name \"" << name
+                                                          << "\" is not used anywhere."};
         }
     }
 
     for (const std::string& rule : used_rules_) {
         if (!rules_map.contains(rule)) {
-            // TODO: throw an error.
-            throw std::runtime_error{"Rule does not exist."};
+            throw errors::ApplicationError{
+                FormatStream() << "A production use undefined rule with name \"" << rule << "\"."};
         }
     }
 }

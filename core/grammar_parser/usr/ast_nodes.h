@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../../utils/format_stream.h"
+#include "../../app/errors.h"
 #include "../../grammar/grammar.h"
 #include "../lib/ast_node.h"
 
@@ -150,15 +152,27 @@ public:
     }
 
     void AddRule(std::shared_ptr<Rule> rule) {
-        // TODO: check rule does not exist
         const auto& header = rule->GetRuleHeader();
+        if (grammar_.HasRule(header.GetRuleName())) {
+            throw errors::ApplicationError{
+                FormatStream()
+                << "Found different rules with the same name \"" << header.GetRuleName()
+                << "\". If you want add multiple productions use only one rule header for it."};
+        }
+
         grammar_.SetReturnType(header.GetRuleName(), header.GetReturnTypeName());
         for (const auto& grammar_rule : rule->GetRules()) {
             grammar_.AddRule(grammar_rule);
         }
 
         if (Is<MainRule>(rule)) {
-            // TODO: check main rule does not exist
+            if (!grammar_.GetMainRule().empty()) {
+                throw errors::ApplicationError{FormatStream()
+                                               << "Can't mark two different rules as main (\""
+                                               << grammar_.GetMainRule() << "\" and \""
+                                               << header.GetRuleName() << "\")."};
+            }
+
             grammar_.SetMainRule(header.GetRuleName());
         }
     }

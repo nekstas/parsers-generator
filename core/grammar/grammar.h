@@ -35,6 +35,7 @@ struct Rule {
 class Grammar {
 public:
     size_t AddRule(const Rule& rule);
+    bool HasRule(const std::string& name);
     const Rule& GetRule(size_t index) const;
     void SetMainRule(const std::string& name);
     void SetReturnType(const std::string& name, const std::string& return_type);
