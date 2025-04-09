@@ -1,6 +1,8 @@
 #include "application.h"
 
 #include "../code/cpp_generator.h"
+#include "../grammar_parser/grammar_parser.h"
+#include "errors.h"
 
 int32_t Application::Run(size_t argc, char** argv) {
     try {
@@ -9,14 +11,24 @@ int32_t Application::Run(size_t argc, char** argv) {
         } else {
             GenerateParser(argv[1], argv[2], argv[3]);
         }
+        return 0;
+    } catch (errors::FilesystemError error) {
+        std::cerr << "A filesystem error has occurred:\n";
+        std::cerr << error.what() << "\n";
+//    } catch (pg::TokenizerError error) {
+//        pg::ErrorPrinter::Print(error);
+//    } catch (pg::ParserError error) {
+//        pg::ErrorPrinter::Print(error);
     } catch (std::runtime_error error) {
-        // TODO: handle an error
-        return 1;
+        std::cerr << "A runtime error has occurred:\n";
+        std::cerr << error.what() << "\n";
+    } catch (std::logic_error error) {
+        std::cerr << "A logic error has occurred:\n";
+        std::cerr << error.what() << "\n";
     } catch (...) {
-        // TODO: handle an error
-        return 2;
+        std::cerr << "An unknown error has occurred.\n";
     }
-    return 0;
+    return 1;
 }
 
 grammar::Symbol MakeT(const std::string& name) {
@@ -29,6 +41,9 @@ grammar::Symbol MakeNT(const std::string& name) {
 
 void Application::GenerateParser(const std::string& action, const std::string& grammar_file,
                                  const std::string& output_path) {
+    //    GrammarParser grammar_parser;
+    //    grammar::Grammar grammar = grammar_parser.Parse(grammar_file);
+
     grammar::Grammar grammar;
 
     grammar.SetReturnType("Symbol", "Symbol");
@@ -80,17 +95,15 @@ void Application::GenerateParser(const std::string& action, const std::string& g
         {"Rule", "CommonRule", {MakeNT("RuleHeader"), MakeNT("ProductionList")}, {true, true}});
     grammar.AddRule({"Rule",
                      "MainRule",
-                     {MakeT("Dog"), MakeNT("RuleHeader"), MakeNT("ProductionList")},
-                     {true, true}});
+                     {MakeT("At"), MakeNT("RuleHeader"), MakeNT("ProductionList")},
+                     {false, true, true}});
 
     grammar.SetReturnType("RuleList", "RuleList");
     grammar.AddRule({"RuleList", "RuleListBegin", {MakeNT("Rule")}, {true}});
     grammar.AddRule(
         {"RuleList", "RuleListContinue", {MakeNT("RuleList"), MakeNT("Rule")}, {true, true}});
 
-    grammar.SetReturnType("Grammar", "Grammar");
-    grammar.AddRule({"Grammar", "Grammar", {MakeNT("RuleList")}, {true}});
-    grammar.SetMainRule("Grammar");
+    grammar.SetMainRule("RuleList");
 
     grammar::GrammarInfo grammar_info(grammar);
     std::cerr << grammar_info << "\n";
@@ -103,8 +116,10 @@ void Application::GenerateParser(const std::string& action, const std::string& g
 
     if (action == "create") {
         code_gen.Create(output_path);
-    } else {
+    } else if (action == "update") {
         code_gen.Update(output_path);
+    } else {
+        // TODO throw an error
     }
 }
 
