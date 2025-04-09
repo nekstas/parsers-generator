@@ -48,8 +48,14 @@ void Application::GenerateParser(const std::string& action, const std::string& g
 
     if (action == "create") {
         code_gen.Create(output_path);
+        std::cout << "Parser for a grammar \n\"" << grammar_file
+                  << "\"\nhas been successfully created in the directory\n\"" << output_path
+                  << "\".";
     } else if (action == "update") {
         code_gen.Update(output_path);
+        std::cout << "Parser for a grammar \n\"" << grammar_file
+                  << "\"\nhas been successfully updated in the directory\n\"" << output_path
+                  << "\".";
     } else {
         throw errors::ApplicationError{FormatStream()
                                        << "Unknown action \"" << action
@@ -58,4 +64,15 @@ void Application::GenerateParser(const std::string& action, const std::string& g
 }
 
 void Application::PrintHelpMessage() {
+    std::cout << "Parsers Generator help message.\n";
+    std::cout << "Usage: parsers_generator <action> <grammar_file> <output_path>\n";
+    std::cout << "- <action> can be 'create' to create a parser for the first time or 'update' to "
+                 "update an existing parser.\n";
+    std::cout << "- <grammar_path> is a path to file with grammar of your language.\n";
+    std::cout << "- <output_path> is a path to output directory.\n";
+    std::cout
+        << "Check syntax of grammar file and generated parser structure on project's GitHub.\n";
+    std::cout << "It's recommended to use re2c to write a lexer for your language.\n\n";
+    std::cout << "Project on GitHub: https://github.com/nekstas/parsers-generator\n";
+    std::cout << "Author: @nekstas (Nekrasov Stanislav)\n";
 }
