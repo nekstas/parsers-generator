@@ -3,11 +3,11 @@ project(parsers_generator)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/core/grammar_parser/usr/lexer.cpp
-        COMMAND re2c ${CMAKE_CURRENT_SOURCE_DIR}/core/grammar_parser/usr/lexer.re -i -o ${CMAKE_CURRENT_SOURCE_DIR}/core/grammar_parser/usr/lexer.cpp
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/core/grammar_parser/usr/lexer.re
-        VERBATIM)
+#add_custom_command(
+#        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/core/grammar_parser/usr/lexer.cpp
+#        COMMAND re2c ${CMAKE_CURRENT_SOURCE_DIR}/core/grammar_parser/usr/lexer.re -i -o ${CMAKE_CURRENT_SOURCE_DIR}/core/grammar_parser/usr/lexer.cpp
+#        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/core/grammar_parser/usr/lexer.re
+#        VERBATIM)
 
 add_executable(parsers_generator main.cpp
         core/grammar/grammar.cpp
