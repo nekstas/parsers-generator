@@ -8,17 +8,6 @@
 #include "../lib/tokenizer.h"
 #include "../usr/ast_nodes.h"
 
-namespace ast {
-class Production;
-class ProductionList;
-class Rule;
-class RuleHeader;
-class RuleList;
-class SequenceOfSymbols;
-class Symbol;
-class TakeSymbol;
-}  // namespace ast
-
 namespace pg {
 class AstBuilder {
 public:

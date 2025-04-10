@@ -685,12 +685,6 @@ void code::CppGenerator::GenerateAstBuilderFile() {
     out << "#include \"../lib/error_printer.h\"\n\n";
     out << "#include \"../usr/ast_nodes.h\"\n\n";
 
-    out << "namespace " << kAstNamespace << " {\n";
-    for (const std::string& return_type : grammar_info_.GetUsedReturnTypes()) {
-        out << "class " << return_type << ";\n";
-    }
-    out << "}\n\n";
-
     out << "namespace " << kMainNamespace << " {\n";
     out << "class " << kAstBuilderClassName << " {\n";
     out << "public:\n";
