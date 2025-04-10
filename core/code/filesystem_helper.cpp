@@ -16,8 +16,8 @@ void fs::FilesystemHelper::MakeDir() {
         } catch (std::filesystem::filesystem_error) {
         }
         if (!directory_created) {
-            throw errors::FilesystemError{FormatStream() << "Can't create a directory "
-                                                         << current_path_ << "."};
+            throw errors::FilesystemError{FormatStream()
+                                          << "Can't create a directory " << current_path_ << "."};
         }
     }
 }
