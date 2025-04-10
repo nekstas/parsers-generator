@@ -19,6 +19,7 @@ public:
 
     virtual std::shared_ptr<ast::Production> HandleProduction(
         std::shared_ptr<ast::SequenceOfSymbols>, const Token&) = 0;
+    virtual std::shared_ptr<ast::Production> HandleEpsProduction(const Token&) = 0;
     virtual std::shared_ptr<ast::ProductionList> HandleProductionListBegin(
         std::shared_ptr<ast::Production>) = 0;
     virtual std::shared_ptr<ast::ProductionList> HandleProductionListContinue(

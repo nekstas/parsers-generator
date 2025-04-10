@@ -102,22 +102,29 @@ void grammar::GrammarInfo::BuildFirstValues() {
     for (const std::string& token : used_tokens_) {
         first_[Symbol::MakeTerminal(token)] = {token};
     }
-    first_[Symbol::MakeTerminal(kEmptyRuleName)] = {kEmptyRuleName};
 
     bool sets_changed = true;
     while (sets_changed) {
         sets_changed = false;
         for (const Rule& rule : grammar_.GetRules()) {
-            auto& current = first_[Symbol::MakeNonTerminal(rule.name)];
-            for (size_t i = 0; i < rule.sequence.size(); ++i) {
-                sets_changed |= MoveTokens(first_[rule.sequence[i]], current);
+            auto nt = Symbol::MakeNonTerminal(rule.name);
+            if (rule.sequence.empty()) {
+                if (!first_[nt].contains(kEpsilon)) {
+                    first_[nt].insert(kEpsilon);
+                    sets_changed = true;
+                }
+                continue;
+            }
 
-                if (!first_[rule.sequence[i]].contains(kEmptyRuleName)) {
+            for (size_t i = 0; i < rule.sequence.size(); ++i) {
+                sets_changed |= MoveTokens(first_[rule.sequence[i]], first_[nt]);
+
+                if (!first_[rule.sequence[i]].contains(kEpsilon)) {
                     break;
                 }
-                if (i == rule.sequence.size() - 1) {
+                if (i == rule.sequence.size() - 1 && !first_[nt].contains(kEpsilon)) {
                     sets_changed = true;
-                    current.insert(kEmptyRuleName);
+                    first_[nt].insert(kEpsilon);
                 }
             }
         }
@@ -137,7 +144,7 @@ void grammar::GrammarInfo::BuildFollowValues() {
                     sets_changed |= MoveTokens(buffer, follow_[rule.sequence[i - 1].value]);
                 }
 
-                if (first_[rule.sequence[i - 1]].contains(kEmptyRuleName)) {
+                if (first_[rule.sequence[i - 1]].contains(kEpsilon)) {
                     MoveTokens(first_[rule.sequence[i - 1]], buffer);
                 } else {
                     buffer = first_[rule.sequence[i - 1]];
@@ -157,9 +164,12 @@ const std::map<std::string, std::set<std::string>>& grammar::GrammarInfo::GetFol
 
 bool grammar::GrammarInfo::MoveTokens(const std::set<std::string>& values,
                                       std::set<std::string>& result) {
+    if (&values == &result) {
+        return false;
+    }
     bool result_changed = false;
     for (const std::string& token : values) {
-        if (token != kEmptyRuleName && !result.contains(token)) {
+        if (token != kEpsilon && !result.contains(token)) {
             result_changed = true;
             result.insert(token);
         }

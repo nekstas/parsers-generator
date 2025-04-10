@@ -38,6 +38,10 @@ std::shared_ptr<ast::Production> GrammarBuilder::HandleProduction(
     return ast::Make<ast::Production>(*sequence, name.value);
 }
 
+std::shared_ptr<ast::Production> GrammarBuilder::HandleEpsProduction(const pg::Token& name) {
+    return ast::Make<ast::Production>(ast::SequenceOfSymbols{}, name.value);
+}
+
 std::shared_ptr<ast::ProductionList> GrammarBuilder::HandleProductionListBegin(
     std::shared_ptr<ast::Production> production) {
     return ast::Make<ast::ProductionList>(*production);

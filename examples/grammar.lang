@@ -12,6 +12,7 @@ $<SequenceOfSymbols> $<TakeSymbol> -> SequenceOfSymbolsContinue
 
 [Production]
 $<SequenceOfSymbols> ArrowRight $Name -> Production
+OpenTr CloseTr ArrowRight $Name -> EpsProduction
 
 [ProductionList]
 $<Production> -> ProductionListBegin

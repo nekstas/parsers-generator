@@ -66,6 +66,16 @@ const Grammar kGrammar = {{
              ast::As<ast::SequenceOfSymbols>(std::get<ast::NodePtr>(args[0])),
              std::get<Token>(args[2]));
      }},
+    {Identifier::Production,
+     {
+         TokenType::OpenTr,
+         TokenType::CloseTr,
+         TokenType::ArrowRight,
+         TokenType::Name,
+     },
+     [](AstBuilder& ast_builder, const Rule::HandlerArgs& args) {
+         return ast_builder.HandleEpsProduction(std::get<Token>(args[3]));
+     }},
     {Identifier::ProductionList,
      {
          Identifier::Production,

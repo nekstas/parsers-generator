@@ -70,6 +70,9 @@ std::ostream& operator<<(std::ostream& out, const grammar::Rule& rule) {
         }
         out << rule.sequence.at(i);
     }
+    if (rule.sequence.empty()) {
+        out << " " << grammar::Grammar::kEpsilonProduction;
+    }
     return out;
 }
 

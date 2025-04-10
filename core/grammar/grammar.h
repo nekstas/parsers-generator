@@ -34,6 +34,9 @@ struct Rule {
 
 class Grammar {
 public:
+    static constexpr std::string kEpsilonProduction = "<>";
+
+public:
     size_t AddRule(const Rule& rule);
     bool HasRule(const std::string& name);
     const Rule& GetRule(size_t index) const;

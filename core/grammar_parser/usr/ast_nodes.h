@@ -40,6 +40,8 @@ private:
 
 class SequenceOfSymbols : public ast::Node {
 public:
+    SequenceOfSymbols() = default;
+
     SequenceOfSymbols(std::shared_ptr<TakeSymbol> symbol) {
         AddSymbol(symbol);
     }

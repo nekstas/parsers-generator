@@ -10,6 +10,7 @@ public:
     void Accept(std::shared_ptr<ast::RuleList> root) override;
     std::shared_ptr<ast::Production> HandleProduction(std::shared_ptr<ast::SequenceOfSymbols>,
                                                       const pg::Token&) override;
+    std::shared_ptr<ast::Production> HandleEpsProduction(const pg::Token& token) override;
     std::shared_ptr<ast::ProductionList> HandleProductionListBegin(
         std::shared_ptr<ast::Production>) override;
     std::shared_ptr<ast::ProductionList> HandleProductionListContinue(

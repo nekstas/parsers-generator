@@ -10,7 +10,7 @@ class GrammarInfo {
 public:
     static constexpr std::string kEofTokenName = "Eof";
     static constexpr std::string kNewMainRuleName = "__main__";
-    static constexpr std::string kEmptyRuleName = "__empty__";
+    static constexpr std::string kEpsilon = "<>";
 
 public:
     GrammarInfo(const Grammar& grammar);
