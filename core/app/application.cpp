@@ -1,8 +1,10 @@
 #include "application.h"
 
+#include "../../utils/filesystem.h"
 #include "../../utils/format_stream.h"
 #include "../code/cpp_generator.h"
-#include "../grammar_parser/grammar_parser.h"
+#include "../grammar_parser/lib/parser.h"
+#include "../grammar_parser/usr/grammar_builder.h"
 #include "errors.h"
 
 int32_t Application::Run(size_t argc, char** argv) {
@@ -37,8 +39,10 @@ int32_t Application::Run(size_t argc, char** argv) {
 
 void Application::GenerateParser(const std::string& action, const std::string& grammar_file,
                                  const std::string& output_path) {
-    GrammarParser grammar_parser;
-    grammar::Grammar grammar = grammar_parser.Parse(grammar_file);
+    std::string code = fs::ReadFile(grammar_file);
+    GrammarBuilder builder;
+    pg::LrParser::Create().Parse(code, builder);
+    grammar::Grammar grammar = builder.GetResult();
 
     grammar::GrammarInfo grammar_info(grammar);
     generators::SlrGenerator generator(grammar_info);

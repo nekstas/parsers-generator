@@ -31,8 +31,6 @@ add_executable(parsers_generator main.cpp
         core/grammar_parser/lib/tokenizer.cpp
         core/grammar_parser/lib/error_printer.cpp
         core/grammar_parser/usr/lexer.cpp
-        core/grammar_parser/grammar_parser.cpp
-        core/grammar_parser/grammar_parser.h
         core/grammar_parser/usr/grammar_builder.cpp
         core/grammar_parser/usr/grammar_builder.h
         core/grammar_parser/usr/grammar_builder.h

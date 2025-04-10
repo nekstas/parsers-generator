@@ -11,7 +11,8 @@ class LrParser {
 public:
     LrParser(const LrData& tables);
 
-    void Parse(const Tokenizer::Result& input, AstBuilder& ast_builder);
+    void Parse(const Tokenizer::Result& input, AstBuilder& ast_builder) const;
+    void Parse(const std::string& code, AstBuilder& ast_builder) const;
 
     static LrParser Create();
 

@@ -7,7 +7,7 @@
 pg::LrParser::LrParser(const pg::LrData& data) : data_(data) {
 }
 
-void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast_builder) {
+void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast_builder) const {
     const auto& tokens = input.tokens;
 
     if (tokens.empty() || tokens.back().type != TokenType::Eof) {
@@ -43,6 +43,11 @@ void pg::LrParser::Parse(const pg::Tokenizer::Result& input, pg::AstBuilder& ast
             throw pg::ParserError("unexpected token", input, i);
         }
     }
+}
+
+void pg::LrParser::Parse(const std::string& code, pg::AstBuilder& ast_builder) const {
+    pg::Tokenizer::Result result = pg::Tokenizer().Tokenize(code);
+    Parse(result, ast_builder);
 }
 
 pg::LrParser pg::LrParser::Create() {
