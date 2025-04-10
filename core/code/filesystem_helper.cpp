@@ -10,9 +10,14 @@ void fs::FilesystemHelper::SetPath(const std::string& path) {
 
 void fs::FilesystemHelper::MakeDir() {
     if (!std::filesystem::exists(current_path_)) {
-        if (!std::filesystem::create_directory(current_path_)) {
-            throw errors::FilesystemError{FormatStream() << "Can't create a directory \""
-                                                         << current_path_ << "\"."};
+        bool directory_created = false;
+        try {
+            directory_created = std::filesystem::create_directory(current_path_);
+        } catch (std::filesystem::filesystem_error) {
+        }
+        if (!directory_created) {
+            throw errors::FilesystemError{FormatStream() << "Can't create a directory "
+                                                         << current_path_ << "."};
         }
     }
 }
