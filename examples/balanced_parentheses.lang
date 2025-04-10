@@ -1,0 +1,3 @@
+@[Sequence]
+<> -> EmptySequence
+Open <Sequence> Close <Sequence> -> NotEmptySequence
